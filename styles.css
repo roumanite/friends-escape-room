@@ -1,3 +1,8 @@
 body {
   font-family: 'Courier New', monospace;
+  user-select: none;
+}
+
+.wt-steps {
+  display: none;
 }
