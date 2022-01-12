@@ -7,6 +7,28 @@
 
 <body>
   Walkthrough
+  <h3 id="rachel-wt">Rachel's beach item</h3>
+  <div class="wt-steps" id="rachel-wt-steps">
+    <ol>
+      <li>Go to Monica's room and collect rubber bands from the green dresser and chopsticks from the brown dresser.</li>
+      <li>Combine the chopsticks and rubber band into a giant poking device.</li>
+      <li>Use the giant poking device to pick Rachel's hat in the kitchen, lodged between the fridge and kitchen counter.</li>
+    </ol>
+  </div>
+
+  <h3 id="phoebe-wt">Phoebe's beach item</h3>
+  <div class="wt-steps" id="phoebe-wt-steps">
+    <ol>
+      <li>Collect baby doll wearing white in living room, behind the flower vase.</li>
+      <li>Collect baby doll wearing brown besides the apartment door.</li>
+      <li>Collect baby doll wearing black in the guest room's white dresser, on the 3rd shelf.</li>
+      <li>Go to the bathroom and put the baby doll wearing white on top left corner of the Glynnis' painting.</li>
+      <li>Put the baby doll wearing black on top right corner.</li>
+      <li>Put the baby doll wearing brown under the baby doll wearing black.</li>
+      <li>Pick up Phoebe's guitar that appears under the painting.</li>
+    </ol>
+  </div>
+
   <h3 id="ross-wt">Ross' beach item</h3>
   <div class="wt-steps" id="ross-wt-steps">
     <ol>
@@ -23,7 +45,7 @@
 </body>
 
 <script>
-  ["ross", "chandler"].forEach(name => {
+  ["rachel", "phoebe", "ross", "chandler"].forEach(name => {
     document.getElementById(`${name}-wt`).onclick = function() {
       toggleDisplay(`${name}-wt-steps`);
     };
