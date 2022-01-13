@@ -6,19 +6,55 @@
 </head>
 
 <body>
-  Walkthrough
-  <h3 id="rachel-wt">Rachel's beach item</h3>
-  <div class="wt-steps" id="rachel-wt-steps">
-    <ol>
+  <header>
+    <h1>Walkthrough</h1>
+    <nav>
+      <a class="button-link" href="index.html">
+        Escape Room
+      </a>
+    </nav>
+  </header>
+  <section>
+    <button class="wt-reveal" id="monica-wt">
+      Monica's beach item
+    </button>
+    <ol class="wt-steps" id="monica-wt-steps">
+      <li>Go to the bathroom and pick up the purple box placed inside the bathtub.</li>
+      <li>Go to the living room and lift the yellow pillow. Pick up the yellow notepad.</li>
+      <li>Click the laptop. The yellow notepad hints that the laptop password is a translation of "Joey Tribbiani". Type in "Baby Kangaroo Tribbiani".</li>
+      <li>
+        A hint for the purple box's code will be displayed. The code is:
+        <ol>
+          <li>Monica's apartment number in that episode - 20</li>
+          <li>How many claps are there in the theme song? - 4</li>
+          <li>Which day is Thursday? - 3</li>
+          <li>Chandler's apartment number in that episode - 19</li>
+          <li>How many steaks are there? - 5</li>
+          <li>How many eggplants are there? - 1</li>
+          <li>How many pages did Ross have to read? - 18</li>
+        </ol>
+        The code is 2043195118.
+      </li>
+      <li>Pick up the jellyfish protection lotion once the box is opened.</li>
+    </ol>
+  </section>
+
+  <section>
+    <button class="wt-reveal" id="rachel-wt">
+      Rachel's beach item
+    </button>
+    <ol class="wt-steps" id="rachel-wt-steps">
       <li>Go to Monica's room and collect rubber bands from the green dresser and chopsticks from the brown dresser.</li>
       <li>Combine the chopsticks and rubber band into a giant poking device.</li>
       <li>Use the giant poking device to pick Rachel's hat in the kitchen, lodged between the fridge and kitchen counter.</li>
     </ol>
-  </div>
+  </section>
 
-  <h3 id="phoebe-wt">Phoebe's beach item</h3>
-  <div class="wt-steps" id="phoebe-wt-steps">
-    <ol>
+  <section>
+    <button class="wt-reveal" id="phoebe-wt">
+      Phoebe's beach item
+    </button>
+    <ol class="wt-steps" id="phoebe-wt-steps">
       <li>Collect baby doll wearing white in living room, behind the flower vase.</li>
       <li>Collect baby doll wearing brown besides the apartment door.</li>
       <li>Collect baby doll wearing black in the guest room's white dresser, on the 3rd shelf.</li>
@@ -27,25 +63,33 @@
       <li>Put the baby doll wearing brown under the baby doll wearing black.</li>
       <li>Pick up Phoebe's guitar that appears under the painting.</li>
     </ol>
-  </div>
+  </section>
 
-  <h3 id="ross-wt">Ross' beach item</h3>
-  <div class="wt-steps" id="ross-wt-steps">
-    <ol>
+  <section>
+    <button class="wt-reveal" id="ross-wt">
+      Ross' beach item
+    </button>
+    <ol class="wt-steps" id="ross-wt-steps">
       <li>Pick up Chandler Figurine in the living room, under the TV.</li>
       <li>Place the Chandler Figurine in the big box in Monica's bedroom.</li>
       <li>Pick up the Midori that appears after the figurine is placed.</li>
     </ol>
-  </div>
+  </section>
 
-  <h3 id="chandler-wt">Chandler's beach item</h3>
-  <div class="wt-steps" id="chandler-wt-steps">
-    Pick up Chandler's glasses on the clothes hanger near the apartment door.
-  </div>
-
-  <h3 id="joey-wt">Joey's beach item</h3>
-  <div class="wt-steps" id="joey-wt-steps">
-    <ol>
+  <section>
+    <button class="wt-reveal" id="chandler-wt">
+      Chandler's beach item
+    </button>
+    <article class="wt-steps" id="chandler-wt-steps">
+      Pick up Chandler's glasses on the clothes hanger near the apartment door.
+    </article>
+  </section>
+  
+  <section>
+    <button class="wt-reveal" id="joey-wt">
+      Joey's beach item
+    </button>
+    <ol class="wt-steps" id="joey-wt-steps">
       <li>Go to Monica's bedroom and collect the coaster from behind the pillows.</li>
       <li>In the guest room:
         <ol type="a">
@@ -72,11 +116,11 @@
         </ol>
       </li>
     </ol>
-  </div>
+  </section>
 </body>
 
 <script>
-  ["rachel", "phoebe", "ross", "chandler", "joey"].forEach(name => {
+  ["monica", "rachel", "phoebe", "ross", "chandler", "joey"].forEach(name => {
     document.getElementById(`${name}-wt`).onclick = function() {
       toggleDisplay(`${name}-wt-steps`);
     };
