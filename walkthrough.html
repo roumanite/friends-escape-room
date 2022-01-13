@@ -42,10 +42,41 @@
   <div class="wt-steps" id="chandler-wt-steps">
     Pick up Chandler's glasses on the clothes hanger near the apartment door.
   </div>
+
+  <h3 id="joey-wt">Joey's beach item</h3>
+  <div class="wt-steps" id="joey-wt-steps">
+    <ol>
+      <li>Go to Monica's bedroom and collect the coaster from behind the pillows.</li>
+      <li>In the guest room:
+        <ol type="a">
+          <li>Pick up the onion inside the 1st shelf of the white dresser.</li>
+          <li>Pick up the cooking oil inside the 2nd shelf of the white dresser.</li>
+          <li>Pick up the breadcrumbs from behind the pillows.</li>
+          <li>Collect The Shining from under the blanket.</li>
+          <li>Collect the green ottoman.</li>
+        </ol>
+      </li>
+      <li>In the living room:
+        <ol type="a">
+          <li>Collect marinara sauce from behind the pink pillow.</li>
+          <li>Place the coaster under the cup on the table. Pick up the egg that appears after the coaster is placed.</li>
+          <li>Place the ottoman infront of the sofa with pink pillow. Pick up the meatball clamp that appears.</li>
+        </ol>
+      </li>
+      <li>In the kitchen:
+        <ol type="a">
+          <li>Collect bread rolls from the blue rack.</li>
+          <li>Click the upper part of the fridge which is the freezer. Place The Shining and a plate of minced beef will appear. Pick up the minced beef.</li>
+          <li>Exit the freezer and enter the bottom half of the fridge. Collect a plate of Mozarella cheese inside.</li>
+          <li>Collect the frying pan from the hanging rack in the kitchen.</li>
+        </ol>
+      </li>
+    </ol>
+  </div>
 </body>
 
 <script>
-  ["rachel", "phoebe", "ross", "chandler"].forEach(name => {
+  ["rachel", "phoebe", "ross", "chandler", "joey"].forEach(name => {
     document.getElementById(`${name}-wt`).onclick = function() {
       toggleDisplay(`${name}-wt-steps`);
     };
