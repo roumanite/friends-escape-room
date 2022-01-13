@@ -1,6 +1,56 @@
 body {
   font-family: 'Courier New', monospace;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 5rem;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+}
+
+section {
+  font-size: 1.25rem;
+  color: rgba(92, 50, 168);
+  font-weight: 600;
+}
+
+section > * {
+  margin-bottom: 3rem;
+}
+
+.button-link {
+  text-decoration: none;
+  border-radius: 20px;
+  padding: 1rem 3rem;
+  background-color: rgba(232, 199, 240, 1);
+  font-size: 1.25rem;
+  color: inherit;
+}
+
+.wt-link {
+  align-self: flex-end;
+}
+
+.resources {
+  background-color: rgba(232, 199, 240, 1);
+  padding: 2rem;
+  border-radius: 30px;
+  min-width: 955px;
+}
+
+.resources > ul > li > a {
+  text-decoration: none;
+  font-weight: 800;
+}
+
+canvas {
+  border: 15px double rgba(92, 50, 168);
+  box-shadow: 0 0 30px rgb(222, 132, 238);
 }
 
 .wt-steps {
