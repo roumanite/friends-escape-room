@@ -15,25 +15,37 @@ function launch() {
     subtitle: '',
   };
 
-  const entranceTs = loadTilesheet("./assets/entrance.png", function() {
-    gameState.layers[Layers.ENTRANCE] = {
-      sprites: loadEntrance(entranceTs),
-      next: Layers.KITCHEN,
-    };
-    assetsLoaded++;
-    if (assetsLoaded === 2) {
-      render();
-    }
-    console.log(gameState, gameState.layers[gameState.currentRoom]);
+  loadTilesheet("./assets/entrance.png", function() {
+    handleTilesheetOnload({
+      [Layers.ENTRANCE]: {
+        sprites: loadEntrance(this),
+        next: Layers.KITCHEN,
+      }
+    });
   });
-  const kitchenTs = loadTilesheet("./assets/kitchen.png", function() {
-    gameState.layers[Layers.KITCHEN] = {
-      sprites: loadKitchen(kitchenTs),
-    };
-    assetsLoaded++;
-    if (assetsLoaded === 2) {
-      render();
-    }
+  loadTilesheet("./assets/kitchen.png", function() {
+    handleTilesheetOnload({
+      [Layers.KITCHEN]: {
+        sprites: loadKitchen(this),
+        previous: Layers.ENTRANCE,
+      },
+      [Layers.STOVE]: {
+        sprites: loadStove(this),
+        previous: Layers.KITCHEN,
+      },
+      [Layers.OVEN]: {
+        sprites: loadOven(this),
+        previous: Layers.KITCHEN,
+      },
+      [Layers.FREEZER]: {
+        sprites: loadFreezer(this),
+        previous: Layers.KITCHEN,
+      },
+      [Layers.BOTTOM_FRIDGE]: {
+        sprites: loadBottomFridge(this),
+        previous: Layers.KITCHEN,
+      }
+    });
   });
 
   const leftArrow = document.getElementsByClassName("left-arrow")[0]
@@ -51,10 +63,34 @@ function launch() {
     }
   }, false)
 
+  window.addEventListener("click", function(e) {
+    const x = e.pageX - canvas.offsetLeft- canvas.clientLeft;
+    const y = e.pageY - canvas.offsetTop-canvas.clientTop;
+    const sprites = gameState.layers[gameState.currentRoom].sprites;
+
+    for (let i = sprites.length-1; i >= 0; i--) {
+      if (sprites[i].onClick(x, y, gameState)) {
+        render();
+        break;
+      }
+    }
+  });
+
+  function handleTilesheetOnload(layerInfo) {
+    Object.entries(layerInfo).forEach(([name, info], i) => {
+      gameState.layers[name] = info;
+    });
+    assetsLoaded++;
+    if (assetsLoaded === tilesheetsNum) {
+      render();
+    }
+  }
+
   function render() {
     renderNavigationArrows();
     renderObjects();
     renderInventory();
+    //ctx.fillStyle = transparentize(Colors.LIGHT_PURPLE, 0.5);
   }
 
   function renderNavigationArrows() {
@@ -74,7 +110,7 @@ function launch() {
     const sprites = gameState.layers[gameState.currentRoom].sprites;
     for(let i = 0; i < sprites.length; i++)
     {
-      var sprite = sprites[i];
+      const sprite = sprites[i];
       ctx.drawImage(
         sprite.img,
         sprite[sprite.state].sourceX, sprite[sprite.state].sourceY, 
