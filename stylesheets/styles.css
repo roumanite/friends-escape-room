@@ -15,10 +15,9 @@ button, select {
 
 .game-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
 }
 
 h1 {
@@ -94,4 +93,13 @@ header {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.left-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-button {
+  cursor: pointer;
+  margin: 2rem;
 }
