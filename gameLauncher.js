@@ -13,7 +13,25 @@ function launch() {
     inventoryItems: [],
     layers: {},
     subtitle: '',
+    page: 1,
   };
+
+  // Game rendition constants
+  const inventory = {
+    arrow: {
+      width: 40,
+      marginLeft: 18,
+      marginRight: 20,
+    },
+    slot: {
+      width: 80,
+      height: 80,
+      margin: 10,
+    }
+  }
+  inventory.perPage = Math.floor(
+    (canvas.width - (inventory.arrow.width + inventory.arrow.marginLeft + inventory.arrow.marginRight) * 2) / inventory.slot.width,
+  );
 
   loadTilesheet("./assets/entrance.png", function() {
     handleTilesheetOnload({
@@ -156,11 +174,40 @@ function launch() {
       }
     }
   }
-  
 
   function renderInventory() {
     ctx.beginPath();
     ctx.fillStyle = Colors.LIGHT_PURPLE;
     ctx.fillRect(0, 677, 955, 100);
+
+    const numberOfItems = gameState.inventoryItems.length % (gameState.page * inventory.perPage) < gameState.inventoryItems.length ?
+      inventory.perPage : gameState.inventoryItems.length - (gameState.page - 1) * inventory.perPage;
+
+    for (let i = inventory.perPage * (gameState.page - 1); i < 9 * (gameState.page - 1) + numberOfItems; i++) {
+      const sprite = gameState.inventoryItems[i];
+      const x = Math.floor(canvas.width / 2) - (40 * numberOfItems + 5 * (numberOfItems - 1)) + 90 * (i - (gameState.page - 1) * inventory.perPage);
+      if (sprite === gameState.selectedInventoryItem) {
+        ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.7);
+      } else {
+        ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
+      }
+
+      ctx.fillRect(x, canvas.height - 100 + 10, inventory.slot.width, inventory.slot.height);
+
+      const srcX = sprite[sprite.state][Displays.STORED].sourceX !== undefined ? sprite[sprite.state][Displays.STORED].sourceX : sprite[sprite.state].sourceX;
+      const srcY = sprite[sprite.state][Displays.STORED].sourceY !== undefined ? sprite[sprite.state][Displays.STORED].sourceY : sprite[sprite.state].sourceY;
+      const srcWidth = sprite[sprite.state][Displays.STORED].sourceWidth !== undefined ? sprite[sprite.state][Displays.STORED].sourceWidth : sprite[sprite.state].sourceWidth;
+      const srcHeight = sprite[sprite.state][Displays.STORED].sourceHeight !== undefined ? sprite[sprite.state][Displays.STORED].sourceHeight : sprite[sprite.state].sourceHeight;
+      const width = sprite[sprite.state][Displays.STORED].scale * srcWidth;
+      const height = sprite[sprite.state][Displays.STORED].scale * srcHeight;
+      
+      ctx.drawImage(
+        sprite.img,
+        srcX, srcY, 
+        srcWidth, srcHeight,
+        x + inventory.slot.width / 2 - width / 2, canvas.height - 100 + 10 + inventory.slot.height/2 - height/2,
+        width, height,
+      );
+    }
   }
 }

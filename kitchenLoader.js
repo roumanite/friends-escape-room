@@ -45,6 +45,91 @@ function loadKitchen(tilesheet) {
           scale: 0.16,
         }
       }
+    },
+    {
+      ...base,
+      onClick: pickUp,
+      states: {
+        INITIAL: {
+          name: Names.FRYING_PAN,
+          x: 43,
+          y: 20,
+          sourceWidth: 106,
+          sourceHeight: 131,
+          sourceX: 2456,
+          sourceY: 407,
+          [Displays.STORED]: {
+            scale: 0.15,
+            sourceWidth: 560,
+            sourceHeight: 271,
+            sourceX: 2356,
+            sourceY: 0,
+          },
+          [Displays.EXAMINED]: {
+            scale: 1,
+            sourceWidth: 560,
+            sourceHeight: 271,
+            sourceX: 2356,
+            sourceY: 0,
+          },
+        },
+        FINAL: {
+          x: 380,
+          y: 275,
+          sourceWidth: 560,
+          sourceHeight: 271,
+          sourceX: 2356,
+          sourceY: 0,
+        }
+      },
+    },
+    {
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
+      states: {
+        INITIAL: {
+          x: 309,
+          y: 45,
+          sourceWidth: 411,
+          sourceHeight: 107,
+          sourceX: 2549,
+          sourceY: 630,
+          scale: 0.2,
+          [Displays.STORED]: {
+            scale: 0.2,
+          },
+        }
+      },
+    },
+    {
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
+      states: {
+        INITIAL: {
+          x: 399,
+          y: 205,
+          sourceWidth: 241,
+          sourceHeight: 316,
+          sourceX: 2592,
+          sourceY: 294,
+          scale: 0.1,
+          [Displays.STORED]: {
+            scale: 0.27,
+          },
+        }
+      },
     }
   ].map(props => craftSprite(props));
 }
@@ -177,14 +262,20 @@ function loadBlueDrawer2(tilesheet) {
     },
     {
       ...base,
+      onClick: pickUp,
       states: {
         INITIAL: {
+          name: Names.MIDORI,
+          description: "Tell me about it",
           x: 600,
           y: 85,
           sourceX: 3817,
           sourceY: 1555,
           sourceWidth: 125,
           sourceHeight: 481,
+          [Displays.STORED]: {
+            scale: 0.15,
+          },
         }
       }
     }
@@ -327,6 +418,13 @@ function loadBottomFridge(tilesheet) {
     },
     {
       ...base, // Mozarella cheese
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
       states: {
         INITIAL: {
           description: "I'm not great with the advice. Can I interest you with a sarcastic comment? Some cheese?",
