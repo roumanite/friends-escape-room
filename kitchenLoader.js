@@ -28,6 +28,16 @@ function loadKitchen(tilesheet) {
         },
       }
     },
+    {
+      img: Layers.STOVE,
+      states: {
+        INITIAL: {
+          x: 4,
+          y: 190,
+          scale: 0.16,
+        }
+      }
+    }
   ].map(props => craftSprite(props));
 }
 

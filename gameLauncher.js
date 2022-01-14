@@ -111,13 +111,26 @@ function launch() {
     for(let i = 0; i < sprites.length; i++)
     {
       const sprite = sprites[i];
-      ctx.drawImage(
-        sprite.img,
-        sprite[sprite.state].sourceX, sprite[sprite.state].sourceY, 
-        sprite[sprite.state].sourceWidth, sprite[sprite.state].sourceHeight,
-        sprite[sprite.state].x, sprite[sprite.state].y, 
-        sprite[sprite.state].scale * sprite[sprite.state].sourceWidth, sprite[sprite.state].scale * sprite[sprite.state].sourceHeight,
-      );
+      if (typeof sprite.img !== "object") {
+        const miniSprites = gameState.layers[sprite.img].sprites;
+        miniSprites.forEach(mini => {
+          ctx.drawImage(
+            mini.img,
+            mini[mini.state].sourceX, mini[mini.state].sourceY, 
+            mini[mini.state].sourceWidth, mini[mini.state].sourceHeight,
+            sprite[sprite.state].scale * mini[mini.state].x + sprite[sprite.state].x, sprite[sprite.state].scale * mini[mini.state].y + sprite[sprite.state].y, 
+            sprite[sprite.state].scale * mini[mini.state].scale * mini[mini.state].sourceWidth, sprite[sprite.state].scale * mini[mini.state].scale * mini[mini.state].sourceHeight,
+          );
+        });
+      } else {
+        ctx.drawImage(
+          sprite.img,
+          sprite[sprite.state].sourceX, sprite[sprite.state].sourceY, 
+          sprite[sprite.state].sourceWidth, sprite[sprite.state].sourceHeight,
+          sprite[sprite.state].x, sprite[sprite.state].y, 
+          sprite[sprite.state].scale * sprite[sprite.state].sourceWidth, sprite[sprite.state].scale * sprite[sprite.state].sourceHeight,
+        );
+      }
     }
   }
   
