@@ -37,6 +37,14 @@ function launch() {
         sprites: loadOven(this),
         previous: Layers.KITCHEN,
       },
+      [Layers.KITCHEN_BLUE_DRAWER_1]: {
+        sprites: loadBlueDrawer1(this),
+        previous: Layers.KITCHEN,
+      },
+      [Layers.KITCHEN_BLUE_DRAWER_2]: {
+        sprites: loadBlueDrawer2(this),
+        previous: Layers.KITCHEN,
+      },
       [Layers.FREEZER]: {
         sprites: loadFreezer(this),
         previous: Layers.KITCHEN,
@@ -130,6 +138,17 @@ function launch() {
           sprite[sprite.state].x, sprite[sprite.state].y, 
           sprite[sprite.state].scale * sprite[sprite.state].sourceWidth, sprite[sprite.state].scale * sprite[sprite.state].sourceHeight,
         );
+      }
+      if (sprite[sprite.state].sprites) {  
+        sprite[sprite.state].sprites.forEach(extra => {
+          ctx.drawImage(
+            extra.img,
+            extra[extra.state].sourceX, extra[extra.state].sourceY, 
+            extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
+            extra[extra.state].x + sprite[sprite.state].x, extra[extra.state].y + sprite[sprite.state].y, 
+            extra[extra.state].scale * extra[extra.state].sourceWidth, extra[extra.state].scale * extra[extra.state].sourceHeight,
+          );
+        });
       }
     }
   }
