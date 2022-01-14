@@ -2,6 +2,7 @@ body {
   font-family: 'Courier New', monospace;
   user-select: none;
   padding: 5rem;
+  background: url('../assets/dots.png');
 }
 
 * {
@@ -75,6 +76,13 @@ canvas {
 
 .wt-steps {
   display: none;
+  padding: 2rem;
+  background-color: rgba(221, 215, 237, 0.7);
+  border-radius: 30px;
+}
+
+.wt-steps > li {
+  margin-left: 2rem;
 }
 
 .wt-reveal {
