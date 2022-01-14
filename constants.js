@@ -34,6 +34,46 @@ const Layers = {
   BATHROOM: 18,
 };
 
+const Names = {
+  // Entrance
+  CHANDLER_GLASSES: "Chandler's glasses",
+  BABY_DOLL_BROWN: 'Baby doll wearing brown',
+
+  // Kitchen
+  MINCED_BEEF: 'Minced Beef',
+  RAW_MEATBALL: 'Raw Meatball',
+  MOZARELLA_CHEESE: 'Mozarella Cheese',
+  FRYING_PAN: 'Frying Pan',
+  FIRE: 'Fire',
+
+  // Living room items
+  TABLE: 'Table',
+  CUP: 'Cup',
+  EGG: 'Egg',
+  BABY_DOLL_WHITE: 'Baby doll wearing white',
+  MEATBALL_CLAMP: 'Meatball Clamp',
+  MARINARA_SAUCE: 'A Jar of Marinara Sauce', // Half the taste is in the smell
+  CHANDLER_FIGURINE: 'Chandler Bing Figurine',
+
+  // Monica's room items
+  RUBBER_BANDS: 'Rubber bands',
+  MIDORI: 'Midori',
+  CHOPSTICKS: 'Chopsticks',
+  COASTER: 'Coaster',
+  GIANT_POKING_DEVICE: 'Giant poking device',
+
+  // Guest room items
+  THE_SHINING: 'The Shining',
+  BREADCRUMBS: 'Breadcrumbs',
+  OTTOMAN: 'The Green Ottoman',
+  COOKING_OIL: 'Cooking Oil',
+  BABY_DOLL_BLACK: 'Baby doll wearing black',
+
+  // Bathroom
+  KEY: 'Apartment key',
+  PHOEBE_GUITAR: "Phoebe's guitar",
+};
+
 const base =
 {
   img: null,
@@ -70,6 +110,9 @@ spriteObject[spriteObject.INITIAL] = {
   [Displays.EXAMINED]: {
     scale: 1,
     rotation: 0,
+  },
+  update: function() {
+    return false;
   },
   isWithinBounds: function(x, y) {
     return isWithinRectBounds(x, y, this.x, this.y, this.sourceWidth * this.scale, this.sourceHeight * this.scale);

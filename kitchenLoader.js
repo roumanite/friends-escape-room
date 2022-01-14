@@ -51,9 +51,44 @@ function loadKitchen(tilesheet) {
 
 function loadStove(tilesheet) {
   const base = { img: tilesheet };
-  return [
+  const fire = craftSprite(
     {
       ...base,
+      states: {
+        INITIAL: {
+          name: Names.FIRE,
+          x: 559,
+          y: 490,
+          sourceWidth: 202,
+          sourceHeight: 79,
+          sourceX: 2355,
+          sourceY: 300,
+          goingRight: true,
+          update: function(x, y, gameState) {
+            if (this.x > 565) {
+              this.goingRight = false;
+            }
+            if (this.x < 555) {
+              this.goingRight = true;
+            }
+            this.x = this.goingRight ? this.x + 1 : this.x - 1;
+            return true;
+          },
+        }
+      },
+    }
+  );
+  return [
+    { // Stove background
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (isWithinRectBounds(x, y, 97, 0, 842, 119)
+          && gameState.layers[gameState.currentRoom].sprites.every(sprite => sprite.name !== Names.FIRE)
+        ) {
+          gameState.layers[gameState.currentRoom].sprites.push(fire);
+          return true;
+        }
+      },
       states: {
         INITIAL: {
           sourceX: 982,

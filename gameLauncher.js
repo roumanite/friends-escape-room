@@ -85,7 +85,7 @@ function launch() {
   });
 
   function handleTilesheetOnload(layerInfo) {
-    Object.entries(layerInfo).forEach(([name, info], i) => {
+    Object.entries(layerInfo).forEach(([name, info]) => {
       gameState.layers[name] = info;
     });
     assetsLoaded++;
@@ -149,6 +149,10 @@ function launch() {
             extra[extra.state].scale * extra[extra.state].sourceWidth, extra[extra.state].scale * extra[extra.state].sourceHeight,
           );
         });
+      }
+
+      if (sprite[sprite.state].update()) {
+        window.requestAnimationFrame(render);
       }
     }
   }
