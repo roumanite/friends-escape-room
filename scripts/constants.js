@@ -169,3 +169,16 @@ const magnifier = {
     return this.margin + this.padding;
   }
 }
+
+const subtitleBox = {
+  exit: {
+    width: 30,
+    height: 30,
+  },
+  lineHeight: 10,
+  padding: 10,
+  fontSize: 25,
+  calcHeight: function(lines) {
+    return this.padding * 2 + (this.fontSize + this.lineHeight) * lines.length;
+  },
+}

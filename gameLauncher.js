@@ -196,6 +196,19 @@ function launch() {
       return;
     }
 
+    if (gameState.subtitle.trim().length > 0) {
+      const lines = getLines(ctx, gameState.subtitle, canvas.width - subtitleBox.padding * 2);
+      const height = subtitleBox.calcHeight(lines);
+      const topOffset = canvas.height - inventory.slot.margin * 2 - inventory.slot.height - height;
+      if (isWithinRectBounds(x, y, canvas.width - subtitleBox.exit.width, topOffset + subtitleBox.padding, subtitleBox.exit.width, subtitleBox.exit.height)) {
+        gameState.subtitle = '';
+        render();
+        return;
+      } else if (isWithinRectBounds(x, y, 0, topOffset)) {
+        return;
+      }
+    }
+
     for (let i = sprites.length - 1; i >= 0; i--) {
       if (sprites[i].onClick(x, y, gameState)) {
         render();
@@ -217,9 +230,43 @@ function launch() {
   function render() {
     renderNavigationArrows();
     renderLayer();
+    renderSubtitle();
     renderMagnifier();
     renderInventory();
     renderInventoryNavigationArrows();
+  }
+
+  function renderSubtitle() {
+    if (gameState.subtitle.trim().length > 0) {
+      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
+      const lines = getLines(ctx, gameState.subtitle, canvas.width - subtitleBox.padding * 2);
+      const height = subtitleBox.calcHeight(lines);
+      const topOffset = canvas.height - inventory.slot.margin * 2 - inventory.slot.height - height;
+
+      ctx.fillRect(
+        0, topOffset,
+        canvas.width, height,
+      );
+
+      ctx.fillStyle = Colors.WHITE;
+      ctx.font = `bold ${subtitleBox.fontSize}px Arial`;
+      lines.forEach(line => {
+        ctx.fillText(
+          line,
+          subtitleBox.padding,
+          topOffset + subtitleBox.lineHeight,
+        );
+      });
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'white';
+      ctx.moveTo(canvas.width - subtitleBox.exit.width, topOffset + subtitleBox.padding);
+      ctx.lineTo(canvas.width - subtitleBox.padding, topOffset + subtitleBox.exit.height);
+
+      ctx.moveTo(canvas.width - subtitleBox.exit.width, topOffset + subtitleBox.exit.height);
+      ctx.lineTo(canvas.width - subtitleBox.padding, topOffset + subtitleBox.padding);
+      ctx.stroke();
+    }
   }
 
   function renderNavigationArrows() {
