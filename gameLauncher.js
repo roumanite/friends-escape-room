@@ -154,7 +154,6 @@ function launch() {
     const x = e.pageX - canvas.offsetLeft - canvas.clientLeft;
     const y = e.pageY - canvas.offsetTop - canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
-
     if (isWithinRectBounds(x, y, 0, 677, 955, 100)) {
       if (isWithinRectBounds(x, y, inventory.prevArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
         gameState.page -= 1;
@@ -177,7 +176,7 @@ function launch() {
             gameState.examinedInventoryItem = sprite;
             gameState.selectedInventoryItem = null;
           } else if (gameState.examinedInventoryItem === sprite) {
-            gameState.examinedInventoryItem =null;
+            gameState.examinedInventoryItem = null;
           } else {
             gameState.selectedInventoryItem = sprite;
           }
@@ -195,6 +194,13 @@ function launch() {
         gameState.examinedInventoryItem = null;
         render();
         return;
+      }
+      if (gameState.selectedInventoryItem) {
+        if (!gameState.examinedInventoryItem.onClick(x, y, gameState)) {
+          gameState.selectedInventoryItem.onClick(x, y, gameState);
+        }
+        gameState.selectedInventoryItem = null;
+        render();
       }
       return;
     }

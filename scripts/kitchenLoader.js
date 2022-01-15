@@ -121,13 +121,7 @@ function loadKitchen(tilesheet) {
     },
     { // Spices
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.SPICES,
@@ -141,6 +135,15 @@ function loadKitchen(tilesheet) {
           [Displays.STORED]: {
             scale: 0.27,
           },
+        },
+        FINAL: {
+          name: Names.MIXED_SPICES,
+          x: 100,
+          y: 30,
+          sourceWidth: 355,
+          sourceHeight: 106,
+          sourceX: 3541,
+          sourceY: 1452,
         }
       },
     }
@@ -340,7 +343,7 @@ function loadBlueDrawer2(tilesheet) {
 }
 
 function loadFreezer(tilesheet) {
-  const base = { img: tilesheet };
+  const base = { img: tilesheet };/*
   const mixture = [
     {
       ...base,
@@ -357,31 +360,8 @@ function loadFreezer(tilesheet) {
       }
     }, {
       ...base,
-      states: {
-        INITIAL: {
-          name: Names.CRACKED_EGG,
-          x: 18,
-          y: 18,
-          sourceWidth: 202,
-          sourceHeight: 191,
-          sourceX: 2715,
-          sourceY: 1259,
-        }
-      }
-    }, {
-      ...base,
-      states: {
-        INITIAL: {
-          name: Names.MIXED_SPICES,
-          x: 100,
-          y: 30,
-          sourceWidth: 355,
-          sourceHeight: 106,
-          sourceX: 3541,
-          sourceY: 1452,
-        }
-      }
-    }, {
+    }, 
+     {
       ...base,
       states: {
         INITIAL: {
@@ -395,11 +375,21 @@ function loadFreezer(tilesheet) {
         }
       }
     },
-  ].map(sprite => craftSprite(sprite));
+  ].map(sprite => craftSprite(sprite));*/
   const mincedBeef = craftSprite({
     ...base,
     onClick: function(x, y, gameState) {
       if (this.state === this.INITIAL) {
+        const spices = combo(gameState, this, Names.SPICES)
+          || combo(gameState, this, Names.EGG);
+        if (spices) {
+          spices.state = spices.FINAL;
+          removeOnce(gameState.inventoryItems, spices);
+          this[this.state].sprites.push(spices);
+          gameState.examinedInventoryItem = this;
+          return true;
+        }
+        
         if (pickUp.bind(this)(x, y, gameState)) {
           return true;
         }

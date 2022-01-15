@@ -85,19 +85,29 @@ function loadLivingRoom(tilesheet) {
         if (this.state === this.HOLDING && isWithinRectBounds(x, y, 653, 452, 40, 15)) {
           const egg = craftSprite({
             img: tilesheet,
-          }, {
-            INITIAL: {
-              name: Names.EGG,
-              description: "The man's got an egg",
-              x: 653,
-              y: 452,
-              sourceX: 827,
-              sourceY: 1637,
-              sourceWidth: 255,
-              sourceHeight: 339,
-              scale: 0.5,
-              [Displays.STORED]: {
-                scale: 0.2,
+            states: {
+              INITIAL: {
+                name: Names.EGG,
+                description: "The man's got an egg",
+                x: 653,
+                y: 452,
+                sourceX: 827,
+                sourceY: 1637,
+                sourceWidth: 255,
+                sourceHeight: 339,
+                scale: 0.5,
+                [Displays.STORED]: {
+                  scale: 0.2,
+                },
+              },
+              FINAL: {
+                name: Names.CRACKED_EGG,
+                x: 18,
+                y: 18,
+                sourceWidth: 194,
+                sourceHeight: 186,
+                sourceX: 1332,
+                sourceY: 447,
               },
             },
           });
@@ -347,7 +357,6 @@ function loadLaptop(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
         if (this.state === this.INITIAL) {
-          console.log(x, y);
           if (isWithinRectBounds(x, y, 270, 428, 50, 50)) {
             this[this.state].sprites.pop();
             return true;
@@ -377,7 +386,6 @@ function loadLaptop(tilesheet) {
                     }
                   }
                 ));
-                console.log(this[this.state].sprites.map(sprite => sprite.name).join(","))
                 if (this[this.state].sprites.map(sprite => sprite.name).join(",") === "1,8,13,6") {
                   this.state = this.FINAL;
                 }

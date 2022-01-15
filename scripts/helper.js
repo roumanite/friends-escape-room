@@ -83,10 +83,24 @@ function removeOnce(arr, value) {
 }
 
 function pickUp(x, y, gameState, state = this.INITIAL) {
-  if (this.state === state && this[this.state].isWithinBounds(x, y)) {
+  if (gameState.examinedInventoryItem !== this
+    && gameState.selectedInventoryItem !== this
+    && this.state === state
+    && this[this.state].isWithinBounds(x, y)
+  ) {
     removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
     gameState.inventoryItems.push(this);
     return true;
   }
   return false;
 };
+
+function combo(gameState, sprite1, sprite2Name) {
+  if (gameState.examinedInventoryItem === sprite1 && gameState.selectedInventoryItem && gameState.selectedInventoryItem.name === sprite2Name) {
+    return gameState.selectedInventoryItem;
+  }
+  if (gameState.selectedInventoryItem === sprite1 && gameState.examinedInventoryItem && gameState.examinedInventoryItem.name === sprite2Name) {
+    return gameState.examinedInventoryItem;
+  }
+  return false;
+}
