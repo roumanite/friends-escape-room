@@ -14,11 +14,12 @@ function loadEntrance(tilesheet) {
         if (isWithinRectBounds(x, y, 101, 110, 222, 436)) {
           if (item && item.name === Names.KEY) {
             const beachStuff = [
-              Names.CHANDLER_GLASSES,
+              //Names.CHANDLER_GLASSES,
               Names.MIDORI,
             ];
             if (beachStuff.every(name => gameState.inventoryItems.findIndex(item => item.name === name) > -1)) {
-              //
+              gameState.gameOver = true;
+              return true;
             }
             gameState.subtitle = 'Something is missing.';
             return true;

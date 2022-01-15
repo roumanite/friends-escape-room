@@ -15,6 +15,7 @@ function launch() {
     layers: {},
     subtitle: '',
     page: 1,
+    gameOver: false,
   };
 
   inventory.perPage = Math.floor(
@@ -147,7 +148,9 @@ function launch() {
     }
   }, false)
 
-  window.addEventListener("click", function(e) {
+  window.addEventListener("click", handleCanvasClick);
+
+  function handleCanvasClick(e) {
     const x = e.pageX - canvas.offsetLeft - canvas.clientLeft;
     const y = e.pageY - canvas.offsetTop - canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
@@ -215,7 +218,7 @@ function launch() {
         break;
       }
     }
-  });
+  }
 
   function handleTilesheetOnload(layerInfo) {
     Object.entries(layerInfo).forEach(([name, info]) => {
@@ -228,12 +231,37 @@ function launch() {
   }
 
   function render() {
-    renderNavigationArrows();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    leftArrow.style.visibility = 'hidden';
+    rightArrow.style.visibility = 'hidden';
+    
     renderLayer();
     renderSubtitle();
     renderMagnifier();
     renderInventory();
     renderInventoryNavigationArrows();
+
+    if (gameState.gameOver) {
+      renderCredits();
+      window.removeEventListener('click', handleCanvasClick);
+      return;
+    }
+    renderNavigationArrows();
+  }
+
+  function renderCredits() {
+    ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.5);
+    ctx.fillRect(20, 20, canvas.width - 20 * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - 20 * 2);
+    ctx.fillStyle = Colors.WHITE;
+    ctx.font = `bold 30px Arial`;
+    ctx.fillText("Congratulations, you have escaped Monica's apartment", 100, 100);
+    ctx.fillText("Enjoy a fun day at the beach!", 100, 150);
+    ctx.fillText("Thanks to David Crane & Marta Kauffman,", 100, 300);
+    ctx.fillText("creator of FRIENDS for inspiring this project", 100, 350);
+    ctx.fillText("art & program by roumanite", 100, 500);
+    ctx.fillText("feedback or bug reports welcomed", 100, 550);
+    ctx.font = '25px Arial';
+    ctx.fillText("https://www.reddit.com/user/roumanite", 100, 600);
   }
 
   function renderSubtitle() {

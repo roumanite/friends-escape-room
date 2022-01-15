@@ -102,4 +102,5 @@ header {
 .nav-button {
   cursor: pointer;
   margin: 2rem;
+  visibility: hidden;
 }
