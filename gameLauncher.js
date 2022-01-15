@@ -1,7 +1,7 @@
 launch();
 
 function launch() {
-  const tilesheetsNum = 2;
+  const tilesheetsNum = 3;
   let assetsLoaded = 0;
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -46,6 +46,7 @@ function launch() {
       [Layers.KITCHEN]: {
         sprites: loadKitchen(this),
         previous: Layers.ENTRANCE,
+        next: Layers.LIVING_ROOM,
       },
       [Layers.STOVE]: {
         sprites: loadStove(this),
@@ -72,6 +73,57 @@ function launch() {
         previous: Layers.KITCHEN,
       }
     });
+  });
+  loadTilesheet("./assets/living_room.png", function() {
+    handleTilesheetOnload({
+      [Layers.LIVING_ROOM]: {
+        sprites: loadLivingRoom(this),
+        previous: Layers.KITCHEN,
+        next: Layers.BATHROOM,
+      },
+      [Layers.LAPTOP]: {
+        sprites: loadLaptop(this),
+        previous: Layers.LIVING_ROOM,
+      }
+    })
+  });
+  loadTilesheet("./assets/monicas_room.png", function() {
+    handleTilesheetOnload({
+      [Layers.MONICAS_ROOM]: {
+        sprites: loadMonicas(this),
+      },
+      [Layers.MONICAS_GREEN_DRAWER_1]: {
+        sprites: loadMonicasGreenDrawer1(this),
+        previous: Layers.MONICAS_ROOM,
+      },
+      [Layers.MONICAS_GREEN_DRAWER_2]: {
+        sprites: loadMonicasGreenDrawer2(this),
+        previous: Layers.MONICAS_ROOM,
+      },
+      [Layers.MONICAS_WHITE_DRAWER]: {
+        sprites: loadMonicasWhiteDrawer(this),
+        previous: Layers.MONICAS_ROOM,
+      },
+      [Layers.BIG_BOX]: {
+        sprites: loadBigBox(this),
+        previous: Layers.MONICAS_ROOM,
+      }
+    })
+  });
+  loadTilesheet("./assets/guest_room.png", function() {
+    handleTilesheetOnload({
+      [Layers.GUEST_ROOM]: {
+        sprites: loadGuestRoom(this),
+      },
+    })
+  });
+  loadTilesheet("./assets/bathroom.png", function() {
+    handleTilesheetOnload({
+      [Layers.BATHROOM]: {
+        sprites: loadBathroom(this),
+        previous: Layers.LIVING_ROOM,
+      },
+    })
   });
 
   const leftArrow = document.getElementsByClassName("left-arrow")[0]
@@ -114,7 +166,7 @@ function launch() {
 
   function render() {
     renderNavigationArrows();
-    renderObjects();
+    renderLayer();
     renderInventory();
     //ctx.fillStyle = transparentize(Colors.LIGHT_PURPLE, 0.5);
   }
@@ -132,7 +184,7 @@ function launch() {
     }
   }
 
-  function renderObjects() {
+  function renderLayer() {
     const sprites = gameState.layers[gameState.currentRoom].sprites;
     for(let i = 0; i < sprites.length; i++)
     {
@@ -149,22 +201,22 @@ function launch() {
           );
         });
       } else {
-        ctx.drawImage(
+        renderSprite(
           sprite.img,
-          sprite[sprite.state].sourceX, sprite[sprite.state].sourceY, 
+          sprite[sprite.state].x, sprite[sprite.state].y,
+          sprite[sprite.state].sourceX, sprite[sprite.state].sourceY,
           sprite[sprite.state].sourceWidth, sprite[sprite.state].sourceHeight,
-          sprite[sprite.state].x, sprite[sprite.state].y, 
-          sprite[sprite.state].scale * sprite[sprite.state].sourceWidth, sprite[sprite.state].scale * sprite[sprite.state].sourceHeight,
+          sprite[sprite.state].rotation, sprite[sprite.state].scale,
         );
       }
       if (sprite[sprite.state].sprites) {  
         sprite[sprite.state].sprites.forEach(extra => {
-          ctx.drawImage(
+          renderSprite(
             extra.img,
-            extra[extra.state].sourceX, extra[extra.state].sourceY, 
+            extra[extra.state].x + sprite[sprite.state].x, extra[extra.state].y + sprite[sprite.state].y,
+            extra[extra.state].sourceX, extra[extra.state].sourceY,
             extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
-            extra[extra.state].x + sprite[sprite.state].x, extra[extra.state].y + sprite[sprite.state].y, 
-            extra[extra.state].scale * extra[extra.state].sourceWidth, extra[extra.state].scale * extra[extra.state].sourceHeight,
+            extra[extra.state].rotation, extra[extra.state].scale,
           );
         });
       }
@@ -201,12 +253,54 @@ function launch() {
       const width = sprite[sprite.state][Displays.STORED].scale * srcWidth;
       const height = sprite[sprite.state][Displays.STORED].scale * srcHeight;
       
-      ctx.drawImage(
+      renderSprite(
         sprite.img,
-        srcX, srcY, 
+        x + inventory.slot.width / 2 - width / 2, canvas.height - 100 + 10 + inventory.slot.height / 2 - height / 2,
+        srcX, srcY,
         srcWidth, srcHeight,
-        x + inventory.slot.width / 2 - width / 2, canvas.height - 100 + 10 + inventory.slot.height/2 - height/2,
+        sprite[sprite.state][Displays.STORED].rotation, sprite[sprite.state][Displays.STORED].scale,
+      )
+    }
+  }
+
+  function renderSprite(
+    img,
+    x, y,
+    sourceX, sourceY,
+    sourceWidth, sourceHeight,
+    rotation, scale,
+  ) {
+    if (rotation > 0) {
+      ctx.save();
+  
+      const width = scale * sourceWidth;
+      const height = scale * sourceHeight;
+    
+      // Rotate the canvas
+      ctx.translate(
+        Math.ceil(x + (width / 2)), 
+        Math.ceil(y + (height / 2))
+      );
+    
+      ctx.rotate(rotation * Math.PI / 180);
+      
+      ctx.drawImage(
+        img,
+        sourceX, sourceY, 
+        sourceWidth, sourceHeight,
+        Math.ceil(-width / 2), Math.ceil(-height / 2),
         width, height,
+      );
+    
+      // Restore the drawing surface to its state before it was rotated
+      ctx.restore();
+    } else {
+      ctx.drawImage(
+        img,
+        sourceX, sourceY, 
+        sourceWidth, sourceHeight,
+        x, y, 
+        scale * sourceWidth, scale * sourceHeight,
       );
     }
   }
