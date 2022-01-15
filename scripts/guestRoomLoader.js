@@ -274,3 +274,167 @@ function loadGuestRoom(tilesheet) {
     }
   ].map(sprite => craftSprite(sprite));
 }
+
+function loadGuestWhiteDrawer1(tilesheet) {
+  const base = { img: tilesheet };
+  return [
+    {
+      ...base,
+      states: {
+        INITIAL: {
+          x: 0,
+          y: 0,
+          sourceWidth: 955,
+          sourceHeight: 677,
+          sourceX: 0,
+          sourceY: 688,
+        }
+      }
+    },
+    {
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
+          
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
+      states: {
+        INITIAL: {
+          name: 'Chopped onions',
+          x: 180,
+          y: 150,
+          sourceWidth: 443,
+          sourceHeight: 315,
+          sourceX: 963,
+          sourceY: 764,
+          scale: 0.7,
+          [Displays.STORED]: {
+            scale: 0.15,
+          },
+        },
+      },
+    },
+  ].map(sprite => craftSprite(sprite));
+}
+
+function loadGuestWhiteDrawer2(tilesheet) {
+  const base = { img: tilesheet };
+  return [
+    {
+      ...base,
+      states: {
+        INITIAL: {
+          x: 0,
+          y: 0,
+          sourceWidth: 955,
+          sourceHeight: 677,
+          sourceX: 0,
+          sourceY: 688,
+        }
+      }
+    },
+    {
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
+          
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
+      states: {
+        INITIAL: {
+          name: Names.COOKING_OIL,
+          scale: 0.9,
+          x: 170,
+          y: 192,
+          sourceWidth: 338,
+          sourceHeight: 350,
+          sourceX: 1426,
+          sourceY: 929,
+          [Displays.STORED]: {
+            scale: 0.19,
+            sourceWidth: 338,
+            sourceHeight: 420,
+            sourceX: 1426,
+            sourceY: 929,
+          },
+          [Displays.EXAMINED]: {
+            scale: 1,
+            sourceWidth: 338,
+            sourceHeight: 420,
+            sourceX: 1426,
+            sourceY: 929,
+          },
+        },
+        FINAL: {
+          x: 508,
+          y: 365,
+          sourceWidth: 314,
+          sourceHeight: 118,
+          sourceX: 1020,
+          sourceY: 1159,
+        }
+      }
+    },
+  ].map(sprite => craftSprite(sprite));
+}
+
+function loadGuestWhiteDrawer3(tilesheet) {
+  const base = { img: tilesheet };
+  return [
+    {
+      ...base,
+      states: {
+        INITIAL: {
+          x: 0,
+          y: 0,
+          sourceWidth: 955,
+          sourceHeight: 677,
+          sourceX: 0,
+          sourceY: 688,
+        },
+      }
+    },
+    {
+      ...base,
+      onClick: function(x, y, gameState) {
+        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
+          
+          gameState.inventoryItems.push(this);
+          return true;
+        }
+      },
+      states: {
+        INITIAL: {
+          name: Names.BABY_DOLL_BLACK,
+          scale: 0.5,
+          x: 500,
+          y: 50,
+          sourceWidth: 230,
+          sourceHeight: 441,
+          sourceX: 1736,
+          sourceY: 545,
+          [Displays.STORED]: {
+            scale: 0.19,
+          },
+        },
+        FINAL: {
+          x: 520,
+          y: 30,
+          sourceWidth: 230,
+          sourceHeight: 441,
+          sourceX: 1736,
+          sourceY: 545,
+          scale: 0.1,
+          rotation: 335,
+        },
+      },
+    }
+  ].map(sprite => craftSprite(sprite));
+}

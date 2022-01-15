@@ -20,6 +20,7 @@ function launch() {
   const inventory = {
     arrow: {
       width: 40,
+      height: 80,
       marginLeft: 18,
       marginRight: 20,
     },
@@ -115,6 +116,18 @@ function launch() {
       [Layers.GUEST_ROOM]: {
         sprites: loadGuestRoom(this),
       },
+      [Layers.GUEST_WHITE_DRAWER_1]: {
+        sprites: loadGuestWhiteDrawer1(this),
+        previous: Layers.GUEST_ROOM,
+      },
+      [Layers.GUEST_WHITE_DRAWER_2]: {
+        sprites: loadGuestWhiteDrawer1(this),
+        previous: Layers.GUEST_ROOM,
+      },
+      [Layers.GUEST_WHITE_DRAWER_3]: {
+        sprites: loadGuestWhiteDrawer1(this),
+        previous: Layers.GUEST_ROOM,
+      }
     })
   });
   loadTilesheet("./assets/bathroom.png", function() {
@@ -277,18 +290,23 @@ function launch() {
 
   function renderInventoryNavigationArrows() {
     const y = canvas.height - inventory.slot.height - 10;
+    // Previous arrow
     if (gameState.page > 1) {
-      ctx.fillStyle = "rgba(92, 50, 168, 0.2)";
-      ctx.moveTo(18, y + 40)
-      ctx.lineTo(18+40, y)
-      ctx.lineTo(18+40, y+80)
+      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
+      ctx.moveTo(inventory.arrow.marginLeft, y + inventory.arrow.width)
+      ctx.lineTo(inventory.arrow.marginLeft + inventory.arrow.width, y)
+      ctx.lineTo(inventory.arrow.marginLeft + inventory.arrow.width, y + inventory.arrow.height)
       ctx.fill()
     }
+    // Next arrow
     if (gameState.inventoryItems.length > inventory.perPage * gameState.page) {
-      ctx.fillStyle = "rgba(92, 50, 168, 0.2)";
-      ctx.moveTo(77+90*8+100, y)
-      ctx.lineTo(77+90*8+140, y+40)
-      ctx.lineTo(77+90*8+100, y+80)
+      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
+      const x = inventory.arrow.marginLeft + inventory.arrow.marginRight +
+        inventory.arrow.width + (inventory.slot.width + inventory.slot.margin) * inventory.perPage + 10;
+
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + inventory.arrow.width, y + 40)
+      ctx.lineTo(x, y + 80)
       ctx.fill()
     }
   }
