@@ -187,7 +187,7 @@ function launch() {
 
     if (gameState.examinedInventoryItem) {
       if (isWithinRectBounds(x, y, magnifier.exitX(canvas.width), magnifier.exitY(), magnifier.exit.width, magnifier.exit.height)
-        || !isWithinRectBounds(x, y, magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - magnifier.margin * 2)
+        || !isWithinRectBounds(x, y, magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - magnifier.margin * 2)
       ) {
         gameState.examinedInventoryItem = null;
         render();
@@ -334,7 +334,7 @@ function launch() {
       ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.5);
       ctx.fillRect(magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - magnifier.margin * 2);
       if (sprite.name.trim().length > 0) {
-        ctx.font = `${magnifier.name.fontSize}px Arial`;
+        ctx.font = `bold ${magnifier.name.fontSize}px Arial`;
         ctx.fillStyle = Colors.WHITE;
         const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
         lines.forEach((line, i) => {
