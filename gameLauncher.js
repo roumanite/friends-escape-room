@@ -145,6 +145,18 @@ function launch() {
     const x = e.pageX - canvas.offsetLeft- canvas.clientLeft;
     const y = e.pageY - canvas.offsetTop-canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
+    const arrowY = canvas.height - inventory.slot.height - 10;
+
+    if (isWithinRectBounds(x, y, 18, arrowY, 40, 80)) {
+      gameState.page -= 1;
+      render();
+      return;
+    }
+    if (isWithinRectBounds(x, y, 77+90*8+100, arrowY, 40, 80)) {
+      gameState.page += 1;
+      render();
+      return;
+    }
 
     for (let i = sprites.length-1; i >= 0; i--) {
       if (sprites[i].onClick(x, y, gameState)) {
@@ -168,7 +180,7 @@ function launch() {
     renderNavigationArrows();
     renderLayer();
     renderInventory();
-    //ctx.fillStyle = transparentize(Colors.LIGHT_PURPLE, 0.5);
+    renderInventoryNavigationArrows();
   }
 
   function renderNavigationArrows() {
@@ -260,6 +272,24 @@ function launch() {
         srcWidth, srcHeight,
         sprite[sprite.state][Displays.STORED].rotation, sprite[sprite.state][Displays.STORED].scale,
       )
+    }
+  }
+
+  function renderInventoryNavigationArrows() {
+    const y = canvas.height - inventory.slot.height - 10;
+    if (gameState.page > 1) {
+      ctx.fillStyle = "rgba(92, 50, 168, 0.2)";
+      ctx.moveTo(18, y + 40)
+      ctx.lineTo(18+40, y)
+      ctx.lineTo(18+40, y+80)
+      ctx.fill()
+    }
+    if (gameState.inventoryItems.length > inventory.perPage * gameState.page) {
+      ctx.fillStyle = "rgba(92, 50, 168, 0.2)";
+      ctx.moveTo(77+90*8+100, y)
+      ctx.lineTo(77+90*8+140, y+40)
+      ctx.lineTo(77+90*8+100, y+80)
+      ctx.fill()
     }
   }
 
