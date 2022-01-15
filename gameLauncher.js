@@ -5,6 +5,7 @@ function launch() {
   let assetsLoaded = 0;
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
+  ctx.textBaseline = "top";
 
   const gameState = {
     selectedInventoryItem: null,
@@ -168,7 +169,6 @@ function launch() {
       for (let i = 9 * (gameState.page - 1); i < 9 * (gameState.page - 1) + numberOfItems; i++) {
         const sprite = gameState.inventoryItems[i];
         const x2 = inventory.boxX(canvas.width, numberOfItems, i, gameState.page);
-        console.log(x, x2, i);
         if (isWithinRectBounds(x, y, x2, 687, 80, 80)) {
           if (gameState.selectedInventoryItem === sprite) {
             gameState.examinedInventoryItem = sprite;
@@ -182,6 +182,14 @@ function launch() {
           render();
           return;
         }
+      }
+    }
+
+    if (gameState.examinedInventoryItem) {
+      if (isWithinRectBounds(x, y, magnifier.x(canvas.width), magnifier.y(), magnifier.exit.width, magnifier.exit.height)) {
+        gameState.examinedInventoryItem = null;
+        render();
+        return;
       }
     }
 
@@ -270,27 +278,63 @@ function launch() {
   function renderMagnifier() {
     if (gameState.examinedInventoryItem) {
       const sprite = gameState.examinedInventoryItem;
+      let topOffset = magnifier.margin + magnifier.padding;
+      const leftOffset = magnifier.margin + magnifier.padding;
+      
       ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.5);
       ctx.fillRect(magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - magnifier.margin * 2);
       if (sprite.name.trim().length > 0) {
-        ctx.font = "35px Arial";
-        ctx.fillStyle = "rgba(255,255,255, 1)";
-        ctx.fillText(sprite.name, 30+30, 50+30);
+        ctx.font = `${magnifier.name.fontSize}px Arial`;
+        ctx.fillStyle = Colors.WHITE;
+        const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2);
+        lines.forEach((line, i) => {
+          ctx.fillText(line, leftOffset, magnifier.margin + magnifier.padding + magnifier.name.fontSize * i);
+          topOffset += magnifier.name.fontSize;
+        });
+        
+        topOffset += magnifier.name.marginBottom;
+
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = Colors.WHITE;
+        ctx.beginPath();
+        ctx.moveTo(magnifier.margin + magnifier.padding, topOffset);
+        ctx.lineTo(canvas.width - magnifier.margin * 2 - magnifier.exit.width - magnifier.padding, topOffset);
+        ctx.stroke();
+
+        topOffset += magnifier.name.marginBottom;
       }
 
       if (sprite.description.trim().length > 0) {
-        ctx.font = "30px Arial";
-        const lines = getLines(ctx, sprite.description, 955-40-40);
-        lines.forEach((line, i) => { ctx.fillText(line, 30+30, 80+20+30+i*42);});
+        ctx.font = `${magnifier.desc.fontSize}px Arial`;
+        ctx.fillStyle = Colors.WHITE;
+        const lines = getLines(ctx, sprite.description, canvas.width - magnifier.margin * 2 - magnifier.padding * 2);
+        lines.forEach((line, i) => {
+          ctx.fillText(line, leftOffset, topOffset + magnifier.desc.fontSize * i);
+          topOffset += magnifier.desc.fontSize;
+        });
+        topOffset += magnifier.desc.marginBottom;
       }
 
       ctx.lineWidth = 4;
-      ctx.strokeStyle = 'white';
-      ctx.moveTo(955-20-20-50+5, 40+5);
-      ctx.lineTo(955-20-20-50+5+40, 40+50-5);
+      ctx.strokeStyle = Colors.WHITE;
+      ctx.beginPath();
+      ctx.moveTo(
+        magnifier.x(canvas.width),
+        magnifier.y(),
+      );
+      ctx.lineTo(
+        magnifier.x(canvas.width) + magnifier.exit.width,
+        magnifier.y() + magnifier.exit.height,
+      );
 
-      ctx.moveTo(955-20-20-50+5+40, 40+5);
-      ctx.lineTo(955-20-20-50+5, 40+50-5);
+      ctx.moveTo(
+        magnifier.x(canvas.width) + magnifier.exit.width,
+        magnifier.y(),
+      );
+      ctx.lineTo(
+        magnifier.x(canvas.width),
+        magnifier.y() + magnifier.exit.height,
+      );
       ctx.stroke();
 
       const srcX = sprite[sprite.state][Displays.EXAMINED].sourceX !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceX : sprite[sprite.state].sourceX;
@@ -299,13 +343,14 @@ function launch() {
       const srcHeight = sprite[sprite.state][Displays.EXAMINED].sourceHeight !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceHeight : sprite[sprite.state].sourceHeight;
       const width = sprite[sprite.state][Displays.EXAMINED].scale * srcWidth;
       const height = sprite[sprite.state][Displays.EXAMINED].scale * srcHeight;
+      const x = (canvas.width - width)/2;
+      const y = (canvas.height - inventory.slot.margin * 2 - inventory.slot.height + topOffset - height)/2;
 
-      ctx.drawImage
-      (
+      ctx.drawImage(
         sprite.img,
         srcX, srcY,
         srcWidth, srcHeight,
-        (955-20-20-20 - width)/2, (777-100-20-20-20 - height)/2,
+        x, y,
         width, height,
       );
     }

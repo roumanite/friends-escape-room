@@ -1,4 +1,5 @@
 const Colors = {
+  WHITE: 'rgba(255,255,255, 1)',
   LIGHT_PURPLE: 'rgba(221, 215, 237, 1)',
   DARK_PURPLE: 'rgba(92, 50, 168, 1)',
 };
@@ -53,7 +54,7 @@ const Names = {
   EGG: 'Egg',
   BABY_DOLL_WHITE: 'Baby doll wearing white',
   MEATBALL_CLAMP: 'Meatball Clamp',
-  MARINARA_SAUCE: 'A Jar of Marinara Sauce', // Half the taste is in the smell
+  MARINARA_SAUCE: 'Marinara Sauce', // Half the taste is in the smell
   CHANDLER_FIGURINE: 'Chandler Bing Figurine',
 
   // Monica's room items
@@ -147,4 +148,23 @@ const inventory = {
 
 const magnifier = {
   margin: 20,
+  padding: 20,
+  exit: {
+    width: 45,
+    height: 45,
+  },
+  name: {
+    fontSize: 35,
+    marginBottom: 25,
+  },
+  desc: {
+    fontSize: 30,
+    marginBottom: 5,
+  },
+  x: function(canvasWidth) {
+    return canvasWidth - this.margin - this.padding - this.exit.width;
+  },
+  y: function() {
+    return this.margin + this.padding;
+  }
 }
