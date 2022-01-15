@@ -82,8 +82,8 @@ function removeOnce(arr, value) {
   return arr;
 }
 
-function pickUp(x, y, gameState) {
-  if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+function pickUp(x, y, gameState, state = this.INITIAL) {
+  if (this.state === state && this[this.state].isWithinBounds(x, y)) {
     removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
     gameState.inventoryItems.push(this);
     return true;

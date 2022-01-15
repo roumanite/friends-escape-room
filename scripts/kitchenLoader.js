@@ -1,7 +1,7 @@
 function loadKitchen(tilesheet) {
   const base = { img: tilesheet };
   return [
-    {
+    { // Kitchen background
       ...base,
       onClick: function(x, y, gameState) {
         if (isWithinRectBounds(x, y, 163, 317, 95, 41)) {
@@ -36,7 +36,7 @@ function loadKitchen(tilesheet) {
         },
       }
     },
-    {
+    { // Zoomed out stove
       img: Layers.STOVE,
       states: {
         INITIAL: {
@@ -46,9 +46,26 @@ function loadKitchen(tilesheet) {
         }
       }
     },
-    {
+    { // Frying pan
       ...base,
-      onClick: pickUp,
+      onClick: function(x, y, gameState) {
+        if (pickUp.bind(this)(x, y, gameState)) {
+          return true;
+        }
+        const item = gameState.selectedInventoryItem;
+        if (item && item.name === Names.COOKING_OIL && this.state === this.FINAL && this[this.state].isWithinBounds(x, y)) {
+          item.state = item.FINAL;
+          removeOnce(gameState.inventoryItems, item);
+          gameState.layers[gameState.currentRoom].sprites.push(item);
+          return true;
+        }
+        
+        if (item && item.name === Names.RAW_MEATBALL && this[this.state].isWithinBounds(x, y)) {
+          removeOnce(gameState.inventoryItems, item);
+          gameState.layers[gameState.currentRoom].sprites.push(item);
+          return true;
+        }
+      },
       states: {
         INITIAL: {
           name: Names.FRYING_PAN,
@@ -83,17 +100,12 @@ function loadKitchen(tilesheet) {
         }
       },
     },
-    {
+    { // Handyman tool
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
+          name: Names.HANDYMAN_TOOL,
           x: 309,
           y: 45,
           sourceWidth: 411,
@@ -107,7 +119,7 @@ function loadKitchen(tilesheet) {
         }
       },
     },
-    {
+    { // Spices
       ...base,
       onClick: function(x, y, gameState) {
         if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
@@ -118,6 +130,7 @@ function loadKitchen(tilesheet) {
       },
       states: {
         INITIAL: {
+          name: Names.SPICES,
           x: 399,
           y: 205,
           sourceWidth: 241,
@@ -139,6 +152,16 @@ function loadStove(tilesheet) {
   const fire = craftSprite(
     {
       ...base,
+      update: function(gameState) {
+        if (this[this.state].x > 565) {
+          this[this.state].goingRight = false;
+        }
+        if (this[this.state].x < 555) {
+          this[this.state].goingRight = true;
+        }
+        this[this.state].x = this[this.state].goingRight ? this[this.state].x + 1 : this[this.state].x - 1;
+        return true;
+      },
       states: {
         INITIAL: {
           name: Names.FIRE,
@@ -149,16 +172,6 @@ function loadStove(tilesheet) {
           sourceX: 2355,
           sourceY: 300,
           goingRight: true,
-          update: function(x, y, gameState) {
-            if (this.x > 565) {
-              this.goingRight = false;
-            }
-            if (this.x < 555) {
-              this.goingRight = true;
-            }
-            this.x = this.goingRight ? this.x + 1 : this.x - 1;
-            return true;
-          },
         }
       },
     }
@@ -167,6 +180,20 @@ function loadStove(tilesheet) {
     { // Stove background
       ...base,
       onClick: function(x, y, gameState) {
+        const item = gameState.selectedInventoryItem;
+        if (item && item.name === Names.FRYING_PAN) {
+          item.state = item.FINAL;
+          removeOnce(gameState.inventoryItems, item);
+          const fireIdx = gameState.layers[gameState.currentRoom].sprites.indexOf(fire);
+          if (fireIdx > -1) {
+            gameState.layers[gameState.currentRoom].sprites.splice(fireIdx, 0, item);
+          } else {
+            gameState.layers[gameState.currentRoom].sprites.push(item);
+          }
+          
+          return true;
+        }
+
         if (isWithinRectBounds(x, y, 97, 0, 842, 119)
           && gameState.layers[gameState.currentRoom].sprites.every(sprite => sprite.name !== Names.FIRE)
         ) {
@@ -187,9 +214,68 @@ function loadStove(tilesheet) {
 
 function loadOven(tilesheet) {
   const base = { img: tilesheet };
+  const door = craftSprite({
+    ...base,
+    onClick: function(x, y, gameState) {
+      if (this[this.state].isWithinBounds(x, y) && this.state !== this.LOCKED) {
+        this.state = this.state === this.INITIAL ? this.CLOSED : this.INITIAL;
+        return true;
+      }
+    },
+    update: function(x, y, gameState) {
+      if (this.state === this.LOCKED) {
+        if (this[this.state].secondsLeft === 0) {
+          this[this.state].secondsLeft = 80;
+          this.state = this.INITIAL;
+        } else {
+          this[this.state].secondsLeft--;
+        }
+        return true;
+      }
+      return false;
+    },
+    states: {
+      INITIAL: {
+        x: -8,
+        y: 528,
+        sourceWidth: 978,
+        sourceHeight: 157,
+        sourceX: 983,
+        sourceY: 1386,
+      },
+      CLOSED: {
+        x: 100,
+        y: 115,
+        sourceWidth: 749,
+        sourceHeight: 427,
+        sourceX: 978,
+        sourceY: 1575,
+      },
+      LOCKED: {
+        x: 100,
+        y: 115,
+        sourceWidth: 749,
+        sourceHeight: 427,
+        sourceX: 1741,
+        sourceY: 1579,
+        secondsLeft: 80,
+      },
+    },
+  });
   return [
     {
       ...base,
+      onClick: function(x, y, gameState) {
+        if (isWithinRectBounds(x, y, this[this.state].x, this[this.state].y, 956, 119)) {
+          if (door.state === door.CLOSED) {
+            door.state = door.LOCKED;
+            return true;
+          } else if (door.state !== door.LOCKED) {
+            gameState.subtitle = 'Close the door first';
+            return true;
+          }
+        }
+      },
       states: {
         INITIAL: {
           sourceX: 981,
@@ -199,36 +285,7 @@ function loadOven(tilesheet) {
         }
       }
     },
-    {
-      ...base,
-      states: {
-        INITIAL: {
-          x: -8,
-          y: 528,
-          sourceWidth: 978,
-          sourceHeight: 157,
-          sourceX: 983,
-          sourceY: 1386,
-        },
-        CLOSED: {
-          x: 100,
-          y: 115,
-          sourceWidth: 749,
-          sourceHeight: 427,
-          sourceX: 978,
-          sourceY: 1575,
-        },
-        LOCKED: {
-          x: 100,
-          y: 115,
-          sourceWidth: 749,
-          sourceHeight: 427,
-          sourceX: 1741,
-          sourceY: 1579,
-        },
-      },
-    },
-  ].map(props => craftSprite(props));
+  ].map(props => craftSprite(props)).concat(door);
 }
 
 function loadBlueDrawer1(tilesheet) {
@@ -284,9 +341,131 @@ function loadBlueDrawer2(tilesheet) {
 
 function loadFreezer(tilesheet) {
   const base = { img: tilesheet };
+  const mixture = [
+    {
+      ...base,
+      states: {
+        INITIAL: {
+          name: Names.MIXED_ONION,
+          x: 270,
+          y: 59,
+          sourceWidth: 269,
+          sourceHeight: 133,
+          sourceX: 2530,
+          sourceY: 749,
+        }
+      }
+    }, {
+      ...base,
+      states: {
+        INITIAL: {
+          name: Names.CRACKED_EGG,
+          x: 18,
+          y: 18,
+          sourceWidth: 202,
+          sourceHeight: 191,
+          sourceX: 2715,
+          sourceY: 1259,
+        }
+      }
+    }, {
+      ...base,
+      states: {
+        INITIAL: {
+          name: Names.MIXED_SPICES,
+          x: 100,
+          y: 30,
+          sourceWidth: 355,
+          sourceHeight: 106,
+          sourceX: 3541,
+          sourceY: 1452,
+        }
+      }
+    }, {
+      ...base,
+      states: {
+        INITIAL: {
+          name: Names.MIXED_BREADCRUMBS,
+          x: 200,
+          y: 70,
+          sourceWidth: 142,
+          sourceHeight: 104,
+          sourceX: 2805,
+          sourceY: 756,
+        }
+      }
+    },
+  ].map(sprite => craftSprite(sprite));
+  const mincedBeef = craftSprite({
+    ...base,
+    onClick: function(x, y, gameState) {
+      if (this.state === this.INITIAL) {
+        if (pickUp.bind(this)(x, y, gameState)) {
+          return true;
+        }
+      }
+    },
+    states: {
+      INITIAL: {
+        x: 100,
+        y: 430,
+        sourceWidth: 565,
+        sourceHeight: 175,
+        sourceX: 1938,
+        sourceY: 615,
+        sprites: [
+          craftSprite({
+            ...base,
+            states: {
+              INITIAL: {
+                x: 2,
+                y: 75,
+                sourceWidth: 560,
+                sourceHeight: 105,
+                sourceX: 3032,
+                sourceY: 1880,
+              }
+            }
+          }),
+        ],
+        [Displays.STORED]: {
+          scale: 0.15,
+          sourceHeight: 220,
+        },
+        [Displays.EXAMINED]: {
+          sourceHeight: 220,
+        },
+      },
+      RAW_MEATBALL: {
+        name: Names.RAW_MEATBALL,
+        sourceX: 1951,
+        sourceY: 1241,
+        sourceWidth: 214,
+        sourceHeight: 127,
+        [Displays.STORED]: {
+          sourceX: 1957,
+          sourceY: 843,
+          sourceWidth: 425,
+          sourceHeight: 394,
+        }
+      },
+    }
+  });
   return [
     {
       ...base, // Freezer background
+      onClick: function(x, y, gameState) {
+        const item = gameState.selectedInventoryItem;
+        if (item && item.name === Names.THE_SHINING
+          && isWithinRectBounds(x, y, 77, 60, 789, 269)) {
+          item.state = item.FINAL;
+          gameState.layers[gameState.currentRoom].sprites.push(item);
+          gameState.layers[gameState.currentRoom].sprites.push(mincedBeef);
+          removeOnce(gameState.inventoryItems, item);
+          
+          return true;
+        }
+      },
       states: {
         INITIAL: {
           sourceX: 0,
@@ -311,80 +490,6 @@ function loadFreezer(tilesheet) {
         }
       }
     },
-    {
-      ...base,
-      states: {
-        INITIAL: {
-          x: 100,
-          y: 400,
-          sourceWidth: 565,
-          sourceHeight: 220,
-          sourceX: 1938,
-          sourceY: 615,
-          sprites: [{
-            ...base,
-            states: {
-              INITIAL: {
-                x: 270,
-                y: 59,
-                sourceWidth: 269,
-                sourceHeight: 133,
-                sourceX: 2530,
-                sourceY: 749,
-              }
-            }
-          }, {
-            ...base,
-            states: {
-              INITIAL: {
-                x: 18,
-                y: 18,
-                sourceWidth: 202,
-                sourceHeight: 191,
-                sourceX: 2715,
-                sourceY: 1259,
-              }
-            }
-          }, {
-            ...base,
-            states: {
-              INITIAL: {
-                x: 100,
-                y: 30,
-                sourceWidth: 355,
-                sourceHeight: 106,
-                sourceX: 3541,
-                sourceY: 1452,
-              }
-            }
-          }, {
-            ...base,
-            states: {
-              INITIAL: {
-                x: 200,
-                y: 70,
-                sourceWidth: 142,
-                sourceHeight: 104,
-                sourceX: 2805,
-                sourceY: 756,
-              }
-            }
-          }, {
-            ...base,
-            states: {
-              INITIAL: {
-                x: 2,
-                y: 75,
-                sourceWidth: 560,
-                sourceHeight: 146,
-                sourceX: 3032,
-                sourceY: 1880,
-              }
-            }
-          }].map(sprite => craftSprite(sprite)),
-        }
-      }
-    }
   ].map(props => craftSprite(props));
 }
 

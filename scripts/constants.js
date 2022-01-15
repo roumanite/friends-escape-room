@@ -44,9 +44,17 @@ const Names = {
   // Kitchen
   MINCED_BEEF: 'Minced Beef',
   RAW_MEATBALL: 'Raw Meatball',
+  HALF_FRIED_MEATBALL: 'Half Cooked Meatball',
+  FRIED_MEATBALL: 'Fried Meatball',
   MOZARELLA_CHEESE: 'Mozarella Cheese',
   FRYING_PAN: 'Frying Pan',
   FIRE: 'Fire',
+  HANDYMAN_TOOL: 'Handyman Tool',
+  SPICES: 'Spices',
+  MIXED_BREADCRUMBS: 'Mixed Breadcrumbs',
+  MIXED_SPICES: 'Mixed Spices',
+  MIXED_ONION: 'Mixed Onion',
+  CRACKED_EGG: 'Cracked Egg',
 
   // Living room items
   TABLE: 'Table',
@@ -83,6 +91,9 @@ const base =
   onClick: function() {
     return false;
   },
+  update: function() {
+    return false;
+  },
 };
 base.state = base.INITIAL;
 const spriteObject = {
@@ -112,9 +123,6 @@ spriteObject[spriteObject.INITIAL] = {
   [Displays.EXAMINED]: {
     scale: 1,
     rotation: 0,
-  },
-  update: function() {
-    return false;
   },
   isWithinBounds: function(x, y) {
     return isWithinRectBounds(x, y, this.x, this.y, this.sourceWidth * this.scale, this.sourceHeight * this.scale);

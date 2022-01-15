@@ -148,7 +148,7 @@ function launch() {
     }
   }, false)
 
-  window.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("click", handleCanvasClick);
 
   function handleCanvasClick(e) {
     const x = e.pageX - canvas.offsetLeft - canvas.clientLeft;
@@ -207,17 +207,20 @@ function launch() {
         gameState.subtitle = '';
         render();
         return;
-      } else if (isWithinRectBounds(x, y, 0, topOffset)) {
+      } else if (isWithinRectBounds(x, y, 0, topOffset, canvas.width, height)) {
         return;
       }
     }
 
+    gameState.subtitle = '';
+
     for (let i = sprites.length - 1; i >= 0; i--) {
       if (sprites[i].onClick(x, y, gameState)) {
-        render();
         break;
       }
     }
+    gameState.selectedInventoryItem = null;
+    render();
   }
 
   function handleTilesheetOnload(layerInfo) {
@@ -347,7 +350,7 @@ function launch() {
         });
       }
 
-      if (sprite[sprite.state].update()) {
+      if (sprite.update()) {
         window.requestAnimationFrame(render);
       }
     }
@@ -431,6 +434,19 @@ function launch() {
         x, y,
         width, height,
       );
+
+      if (sprite[sprite.state].sprites) {  
+        sprite[sprite.state].sprites.forEach(extra => {
+          const scale = extra[extra.state].scale * sprite[sprite.state][Displays.EXAMINED].scale;
+          renderSprite(
+            extra.img,
+            x + extra[extra.state].x * scale, y + extra[extra.state].y * scale,
+            extra[extra.state].sourceX, extra[extra.state].sourceY,
+            extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
+            extra[extra.state].rotation, scale,
+          );
+        });
+      }
     }
   }
 
@@ -459,14 +475,29 @@ function launch() {
       const srcHeight = sprite[sprite.state][Displays.STORED].sourceHeight !== undefined ? sprite[sprite.state][Displays.STORED].sourceHeight : sprite[sprite.state].sourceHeight;
       const width = sprite[sprite.state][Displays.STORED].scale * srcWidth;
       const height = sprite[sprite.state][Displays.STORED].scale * srcHeight;
+      const spriteX = x + inventory.slot.width / 2 - width / 2;
+      const spriteY = canvas.height - 100 + 10 + inventory.slot.height / 2 - height / 2;
       
       renderSprite(
         sprite.img,
-        x + inventory.slot.width / 2 - width / 2, canvas.height - 100 + 10 + inventory.slot.height / 2 - height / 2,
+        spriteX, spriteY,
         srcX, srcY,
         srcWidth, srcHeight,
         sprite[sprite.state][Displays.STORED].rotation, sprite[sprite.state][Displays.STORED].scale,
       )
+
+      if (sprite[sprite.state].sprites) {  
+        sprite[sprite.state].sprites.forEach(extra => {
+          const scale = extra[extra.state].scale * sprite[sprite.state][Displays.STORED].scale;
+          renderSprite(
+            extra.img,
+            spriteX + extra[extra.state].x * scale, spriteY + extra[extra.state].y * scale,
+            extra[extra.state].sourceX, extra[extra.state].sourceY,
+            extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
+            extra[extra.state].rotation, scale,
+          );
+        });
+      }
     }
   }
 

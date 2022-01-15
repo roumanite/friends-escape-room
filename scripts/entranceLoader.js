@@ -14,7 +14,7 @@ function loadEntrance(tilesheet) {
         if (isWithinRectBounds(x, y, 101, 110, 222, 436)) {
           if (item && item.name === Names.KEY) {
             const beachStuff = [
-              //Names.CHANDLER_GLASSES,
+              Names.CHANDLER_GLASSES,
               Names.MIDORI,
             ];
             if (beachStuff.every(name => gameState.inventoryItems.findIndex(item => item.name === name) > -1)) {
@@ -32,8 +32,10 @@ function loadEntrance(tilesheet) {
     },
     {
       ...base,
+      onClick: pickUp,
       states: {
         INITIAL: {
+          name: Names.BABY_DOLL_BROWN,
           scale: 0.15,
           x: 5,
           y: 156,
