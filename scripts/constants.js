@@ -152,6 +152,7 @@ const magnifier = {
   exit: {
     width: 45,
     height: 45,
+    margin: 5,
   },
   name: {
     fontSize: 35,
@@ -161,10 +162,10 @@ const magnifier = {
     fontSize: 30,
     marginBottom: 5,
   },
-  x: function(canvasWidth) {
+  exitX: function(canvasWidth) {
     return canvasWidth - this.margin - this.padding - this.exit.width;
   },
-  y: function() {
+  exitY: function() {
     return this.margin + this.padding;
   }
 }

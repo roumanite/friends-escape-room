@@ -186,14 +186,17 @@ function launch() {
     }
 
     if (gameState.examinedInventoryItem) {
-      if (isWithinRectBounds(x, y, magnifier.x(canvas.width), magnifier.y(), magnifier.exit.width, magnifier.exit.height)) {
+      if (isWithinRectBounds(x, y, magnifier.exitX(canvas.width), magnifier.exitY(), magnifier.exit.width, magnifier.exit.height)
+        || !isWithinRectBounds(x, y, magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - magnifier.margin * 2)
+      ) {
         gameState.examinedInventoryItem = null;
         render();
         return;
       }
+      return;
     }
 
-    for (let i = sprites.length-1; i >= 0; i--) {
+    for (let i = sprites.length - 1; i >= 0; i--) {
       if (sprites[i].onClick(x, y, gameState)) {
         render();
         break;
@@ -286,7 +289,7 @@ function launch() {
       if (sprite.name.trim().length > 0) {
         ctx.font = `${magnifier.name.fontSize}px Arial`;
         ctx.fillStyle = Colors.WHITE;
-        const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2);
+        const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
         lines.forEach((line, i) => {
           ctx.fillText(line, leftOffset, magnifier.margin + magnifier.padding + magnifier.name.fontSize * i);
           topOffset += magnifier.name.fontSize;
@@ -307,7 +310,7 @@ function launch() {
       if (sprite.description.trim().length > 0) {
         ctx.font = `${magnifier.desc.fontSize}px Arial`;
         ctx.fillStyle = Colors.WHITE;
-        const lines = getLines(ctx, sprite.description, canvas.width - magnifier.margin * 2 - magnifier.padding * 2);
+        const lines = getLines(ctx, sprite.description, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
         lines.forEach((line, i) => {
           ctx.fillText(line, leftOffset, topOffset + magnifier.desc.fontSize * i);
           topOffset += magnifier.desc.fontSize;
@@ -319,21 +322,21 @@ function launch() {
       ctx.strokeStyle = Colors.WHITE;
       ctx.beginPath();
       ctx.moveTo(
-        magnifier.x(canvas.width),
-        magnifier.y(),
+        magnifier.exitX(canvas.width),
+        magnifier.exitY(),
       );
       ctx.lineTo(
-        magnifier.x(canvas.width) + magnifier.exit.width,
-        magnifier.y() + magnifier.exit.height,
+        magnifier.exitX(canvas.width) + magnifier.exit.width,
+        magnifier.exitY() + magnifier.exit.height,
       );
 
       ctx.moveTo(
-        magnifier.x(canvas.width) + magnifier.exit.width,
-        magnifier.y(),
+        magnifier.exitX(canvas.width) + magnifier.exit.width,
+        magnifier.exitY(),
       );
       ctx.lineTo(
-        magnifier.x(canvas.width),
-        magnifier.y() + magnifier.exit.height,
+        magnifier.exitX(canvas.width),
+        magnifier.exitY() + magnifier.exit.height,
       );
       ctx.stroke();
 
