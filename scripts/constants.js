@@ -119,3 +119,32 @@ spriteObject[spriteObject.INITIAL] = {
     return isWithinRectBounds(x, y, this.x, this.y, this.sourceWidth * this.scale, this.sourceHeight * this.scale);
   },
 };
+
+// Game rendition constants
+const inventory = {
+  arrow: {
+    width: 40,
+    height: 80,
+    marginLeft: 19,
+    marginRight: 18,
+    marginTop: 10,
+  },
+  slot: {
+    width: 80,
+    height: 80,
+    margin: 10,
+  },
+  boxX: function(canvasWidth, numberOfItems, i, page) {
+    return Math.floor(canvasWidth / 2) - (this.slot.width / 2 * numberOfItems +
+      this.slot.margin / 2 * (numberOfItems - 1)) +
+      (this.slot.width + this.slot.margin) * (i - (page - 1) * this.perPage);
+  },
+  numOfItems: function(total, page) {
+    return total % (page * this.perPage) < total ?
+      this.perPage : total - (page - 1) * this.perPage;
+  },
+}
+
+const magnifier = {
+  margin: 20,
+}

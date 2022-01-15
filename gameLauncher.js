@@ -16,23 +16,15 @@ function launch() {
     page: 1,
   };
 
-  // Game rendition constants
-  const inventory = {
-    arrow: {
-      width: 40,
-      height: 80,
-      marginLeft: 18,
-      marginRight: 20,
-    },
-    slot: {
-      width: 80,
-      height: 80,
-      margin: 10,
-    }
-  }
   inventory.perPage = Math.floor(
-    (canvas.width - (inventory.arrow.width + inventory.arrow.marginLeft + inventory.arrow.marginRight) * 2) / inventory.slot.width,
+    (canvas.width - (inventory.arrow.width + inventory.arrow.marginLeft + inventory.arrow.marginRight) * 2) /
+    (inventory.slot.width + inventory.slot.margin - 1),
   );
+
+  inventory.prevArrowX = inventory.arrow.marginLeft;
+  inventory.nextArrowX = inventory.arrow.marginLeft * 2 + inventory.arrow.marginRight +
+    inventory.arrow.width + (inventory.slot.width * inventory.perPage + inventory.slot.margin * (inventory.perPage-1));
+  inventory.arrowY = canvas.height - inventory.slot.height - inventory.slot.margin;
 
   loadTilesheet("./assets/entrance.png", function() {
     handleTilesheetOnload({
@@ -121,11 +113,11 @@ function launch() {
         previous: Layers.GUEST_ROOM,
       },
       [Layers.GUEST_WHITE_DRAWER_2]: {
-        sprites: loadGuestWhiteDrawer1(this),
+        sprites: loadGuestWhiteDrawer2(this),
         previous: Layers.GUEST_ROOM,
       },
       [Layers.GUEST_WHITE_DRAWER_3]: {
-        sprites: loadGuestWhiteDrawer1(this),
+        sprites: loadGuestWhiteDrawer3(this),
         previous: Layers.GUEST_ROOM,
       }
     })
@@ -155,20 +147,42 @@ function launch() {
   }, false)
 
   window.addEventListener("click", function(e) {
-    const x = e.pageX - canvas.offsetLeft- canvas.clientLeft;
-    const y = e.pageY - canvas.offsetTop-canvas.clientTop;
+    const x = e.pageX - canvas.offsetLeft - canvas.clientLeft;
+    const y = e.pageY - canvas.offsetTop - canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
-    const arrowY = canvas.height - inventory.slot.height - 10;
 
-    if (isWithinRectBounds(x, y, 18, arrowY, 40, 80)) {
-      gameState.page -= 1;
-      render();
-      return;
-    }
-    if (isWithinRectBounds(x, y, 77+90*8+100, arrowY, 40, 80)) {
-      gameState.page += 1;
-      render();
-      return;
+    if (isWithinRectBounds(x, y, 0, 677, 955, 100)) {
+      if (isWithinRectBounds(x, y, inventory.prevArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
+        gameState.page -= 1;
+        render();
+        return;
+      }
+      if (isWithinRectBounds(x, y, inventory.nextArrowY, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
+        gameState.page += 1;
+        render();
+        return;
+      }
+
+      const numberOfItems = inventory.numOfItems(gameState.inventoryItems.length, gameState.page);
+
+      for (let i = 9 * (gameState.page - 1); i < 9 * (gameState.page - 1) + numberOfItems; i++) {
+        const sprite = gameState.inventoryItems[i];
+        const x2 = inventory.boxX(canvas.width, numberOfItems, i, gameState.page);
+        console.log(x, x2, i);
+        if (isWithinRectBounds(x, y, x2, 687, 80, 80)) {
+          if (gameState.selectedInventoryItem === sprite) {
+            gameState.examinedInventoryItem = sprite;
+            gameState.selectedInventoryItem = null;
+          } else if (gameState.examinedInventoryItem === sprite) {
+            gameState.examinedInventoryItem =null;
+          } else {
+            gameState.selectedInventoryItem = sprite;
+          }
+          
+          render();
+          return;
+        }
+      }
     }
 
     for (let i = sprites.length-1; i >= 0; i--) {
@@ -192,6 +206,7 @@ function launch() {
   function render() {
     renderNavigationArrows();
     renderLayer();
+    renderMagnifier();
     renderInventory();
     renderInventoryNavigationArrows();
   }
@@ -252,6 +267,50 @@ function launch() {
     }
   }
 
+  function renderMagnifier() {
+    if (gameState.examinedInventoryItem) {
+      const sprite = gameState.examinedInventoryItem;
+      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.5);
+      ctx.fillRect(magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - magnifier.margin * 2);
+      if (sprite.name.trim().length > 0) {
+        ctx.font = "35px Arial";
+        ctx.fillStyle = "rgba(255,255,255, 1)";
+        ctx.fillText(sprite.name, 30+30, 50+30);
+      }
+
+      if (sprite.description.trim().length > 0) {
+        ctx.font = "30px Arial";
+        const lines = getLines(ctx, sprite.description, 955-40-40);
+        lines.forEach((line, i) => { ctx.fillText(line, 30+30, 80+20+30+i*42);});
+      }
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'white';
+      ctx.moveTo(955-20-20-50+5, 40+5);
+      ctx.lineTo(955-20-20-50+5+40, 40+50-5);
+
+      ctx.moveTo(955-20-20-50+5+40, 40+5);
+      ctx.lineTo(955-20-20-50+5, 40+50-5);
+      ctx.stroke();
+
+      const srcX = sprite[sprite.state][Displays.EXAMINED].sourceX !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceX : sprite[sprite.state].sourceX;
+      const srcY = sprite[sprite.state][Displays.EXAMINED].sourceY !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceY : sprite[sprite.state].sourceY;
+      const srcWidth = sprite[sprite.state][Displays.EXAMINED].sourceWidth !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceWidth : sprite[sprite.state].sourceWidth;
+      const srcHeight = sprite[sprite.state][Displays.EXAMINED].sourceHeight !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceHeight : sprite[sprite.state].sourceHeight;
+      const width = sprite[sprite.state][Displays.EXAMINED].scale * srcWidth;
+      const height = sprite[sprite.state][Displays.EXAMINED].scale * srcHeight;
+
+      ctx.drawImage
+      (
+        sprite.img,
+        srcX, srcY,
+        srcWidth, srcHeight,
+        (955-20-20-20 - width)/2, (777-100-20-20-20 - height)/2,
+        width, height,
+      );
+    }
+  }
+
   function renderInventory() {
     ctx.beginPath();
     ctx.fillStyle = Colors.LIGHT_PURPLE;
@@ -289,24 +348,22 @@ function launch() {
   }
 
   function renderInventoryNavigationArrows() {
-    const y = canvas.height - inventory.slot.height - 10;
     // Previous arrow
     if (gameState.page > 1) {
+      ctx.beginPath();
       ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
-      ctx.moveTo(inventory.arrow.marginLeft, y + inventory.arrow.width)
-      ctx.lineTo(inventory.arrow.marginLeft + inventory.arrow.width, y)
-      ctx.lineTo(inventory.arrow.marginLeft + inventory.arrow.width, y + inventory.arrow.height)
+      ctx.moveTo(inventory.prevArrowX, inventory.arrowY + inventory.arrow.width)
+      ctx.lineTo(inventory.prevArrowX + inventory.arrow.width, inventory.arrowY)
+      ctx.lineTo(inventory.prevArrowX + inventory.arrow.width, inventory.arrowY + inventory.arrow.height)
       ctx.fill()
     }
     // Next arrow
     if (gameState.inventoryItems.length > inventory.perPage * gameState.page) {
+      ctx.beginPath();
       ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
-      const x = inventory.arrow.marginLeft + inventory.arrow.marginRight +
-        inventory.arrow.width + (inventory.slot.width + inventory.slot.margin) * inventory.perPage + 10;
-
-      ctx.moveTo(x, y)
-      ctx.lineTo(x + inventory.arrow.width, y + 40)
-      ctx.lineTo(x, y + 80)
+      ctx.moveTo(inventory.nextArrowX, inventory.arrowY)
+      ctx.lineTo(inventory.nextArrowX + inventory.arrow.width, inventory.arrowY + 40)
+      ctx.lineTo(inventory.nextArrowX, inventory.arrowY + 80)
       ctx.fill()
     }
   }

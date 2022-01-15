@@ -4,6 +4,26 @@ const transparentize =  (color, opacity) => {
   return color.slice(0, lastIndex) + opacity + color.slice(lastIndex + 1);
 };
 
+// https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
+getLines = (ctx, text, maxWidth) => {
+  var words = text.split(" ");
+  var lines = [];
+  var currentLine = words[0];
+
+  for (var i = 1; i < words.length; i++) {
+    var word = words[i];
+    var width = ctx.measureText(currentLine + " " + word).width;
+    if (width < maxWidth) {
+      currentLine += " " + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  lines.push(currentLine);
+  return lines;
+}
+
 loadTilesheet = (filename, loadHandler) => {
   const tilesheet = new Image();
   tilesheet.addEventListener("load", loadHandler, false);
