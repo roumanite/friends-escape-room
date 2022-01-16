@@ -12,8 +12,8 @@ function loadBathroom(tilesheet) {
           y: 100,
           sourceWidth: 105,
           sourceHeight: 306,
-          sourceX: 1187,
-          sourceY: 7,
+          sourceX: 236,
+          sourceY: 1453,
           [Displays.STORED]: {
             scale: 0.3,
           }

@@ -160,7 +160,7 @@ function launch() {
         render();
         return;
       }
-      if (isWithinRectBounds(x, y, inventory.nextArrowY, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
+      if (isWithinRectBounds(x, y, inventory.nextArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
         gameState.page += 1;
         render();
         return;
@@ -354,7 +354,7 @@ function launch() {
         });
       }
 
-      if (sprite.update()) {
+      if (sprite.update(gameState)) {
         window.requestAnimationFrame(render);
       }
     });
@@ -439,12 +439,13 @@ function launch() {
       if (sprite[sprite.state].sprites) {  
         sprite[sprite.state].sprites.forEach(extra => {
           const scale = extra[extra.state].scale * examinedSprite.scale;
+          const examinedExtra = extra[extra.state][Displays.EXAMINED];
           renderSprite(
             extra.img,
-            x + extra[extra.state].x * scale, y + extra[extra.state].y * scale,
-            extra[extra.state].sourceX, extra[extra.state].sourceY,
-            extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
-            extra[extra.state].rotation, scale,
+            x + examinedExtra.x * scale, y + examinedExtra.y * scale,
+            examinedExtra.sourceX, examinedExtra.sourceY,
+            examinedExtra.sourceWidth, examinedExtra.sourceHeight,
+            examinedExtra.rotation, scale,
           );
         });
       }
@@ -487,12 +488,13 @@ function launch() {
       if (sprite[sprite.state].sprites) {  
         sprite[sprite.state].sprites.forEach(extra => {
           const scale = extra[extra.state].scale * storedSprite.scale;
+          const storedExtra = extra[extra.state][Displays.STORED];
           renderSprite(
             extra.img,
-            spriteX + extra[extra.state].x * scale, spriteY + extra[extra.state].y * scale,
-            extra[extra.state].sourceX, extra[extra.state].sourceY,
-            extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
-            extra[extra.state].rotation, scale,
+            spriteX + storedExtra.x * scale, spriteY + storedExtra.y * scale,
+            storedExtra.sourceX, storedExtra.sourceY,
+            storedExtra.sourceWidth, storedExtra.sourceHeight,
+            storedExtra.rotation, scale,
           );
         });
       }

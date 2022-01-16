@@ -324,12 +324,11 @@ function loadGuestWhiteDrawer1(tilesheet) {
           },
         },
         FINAL: {
-          name: Names.MIXED_ONION,
           sourceWidth: 266,
           sourceHeight: 136,
           sourceX: 1425,
           sourceY: 760,
-          x: 270,
+          x: 260,
           y: 59,
         }
       },

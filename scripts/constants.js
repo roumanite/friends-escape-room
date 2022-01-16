@@ -51,10 +51,6 @@ const Names = {
   FIRE: 'Fire',
   HANDYMAN_TOOL: 'Handyman Tool',
   SPICES: 'Spices',
-  MIXED_BREADCRUMBS: 'Mixed Breadcrumbs',
-  MIXED_SPICES: 'Mixed Spices',
-  MIXED_ONION: 'Mixed Onion',
-  CRACKED_EGG: 'Cracked Egg',
 
   // Living room items
   TABLE: 'Table',

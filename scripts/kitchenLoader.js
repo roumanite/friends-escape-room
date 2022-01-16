@@ -135,7 +135,6 @@ function loadKitchen(tilesheet) {
           [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
-          name: Names.MIXED_SPICES,
           x: 100,
           y: 30,
           sourceWidth: 355,
@@ -223,13 +222,13 @@ function loadOven(tilesheet) {
         return true;
       }
     },
-    update: function(x, y, gameState) {
+    update: function(gameState) {
       if (this.state === this.LOCKED) {
-        if (this[this.state].secondsLeft === 0) {
-          this[this.state].secondsLeft = 80;
+        if (this[this.state].timer === 0) {
+          this[this.state].timer = this[this.state].defaultTimer;
           this.state = this.INITIAL;
         } else {
-          this[this.state].secondsLeft--;
+          this[this.state].timer--;
         }
         return true;
       }
@@ -259,7 +258,8 @@ function loadOven(tilesheet) {
         sourceHeight: 427,
         sourceX: 1741,
         sourceY: 1579,
-        secondsLeft: 80,
+        defaultTimer: 80,
+        timer: 80,
       },
     },
   });
@@ -348,55 +348,100 @@ function loadFreezer(tilesheet) {
     Names.BREADCRUMBS,
     Names.SPICES,
   ];
+  const frontPlate = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        x: 0,
+        y: 79,
+        sourceWidth: 562,
+        sourceHeight: 105,
+        sourceX: 3030,
+        sourceY: 1889,
+        [Displays.STORED]: {
+          sourceHeight: 138,
+        },
+        [Displays.EXAMINED]: {
+          sourceHeight: 138,
+        },
+      },
+    }
+  });
   const mincedBeef = craftSprite({
     ...base,
     onClick: function(x, y, gameState) {
       if (this.state === this.INITIAL) {
-        for (let i = 0; i < mixture.length; i++) {
-          const ingredient = combo(gameState, this, mixture[i]);
+        if (pickUp.bind(this)(x, y, gameState)) {
+          return true;
+        }
+
+        const sprites = Array(mixture.length).fill(null).concat(frontPlate);
+        let shouldRender = false;
+        mixture.forEach((ingredientName, i) => {
+          const ingredient = combo(gameState, this, ingredientName);
           if (ingredient) {
+            shouldRender = true;
             ingredient.state = ingredient.FINAL;
             removeOnce(gameState.inventoryItems, ingredient);
-            this[this.state].sprites.splice(i, 0, ingredient);
+            if (this[this.state].sprites.length > 0) {
+              this[this.state].description += ' ';
+            }
+            this[this.state].description += `+ ${ingredient.name}`;
+            sprites[i] = ingredient;
             gameState.examinedInventoryItem = this;
-            return true;
+          } else {
+            const sprite = this[this.state].sprites.find(sprite => sprite.name === ingredientName);
+            if (sprite) {
+              sprites[i] = sprite;
+            }
+          }
+        });
+        if (shouldRender) {
+          this[this.state].sprites = sprites.filter(sprite => sprite);
+          return true;
+        }
+        if (this[this.state].sprites.length === mixture.length + 1) {
+          const clamp = combo(gameState, this, Names.MEATBALL_CLAMP);
+          if (clamp) {
+            this.state = this.RAW;
           }
         }
-        
-        if (pickUp.bind(this)(x, y, gameState)) {
+      }
+
+      if (this.state === this.FRIED) {
+        if (pickUp.bind(this)(x, y, gameState, this.state)) {
           return true;
         }
       }
     },
+    update: function(gameState) {
+      if (this.state === this.RAW || this.state === this.HALF_FRIED) {
+        if (this[this.state].timer === 0) {
+          this[this.state].timer = this[this.state].defaultTimer;
+          if (this.state === this.RAW) {
+            this.state = this.HALF_FRIED;
+          } else {
+            this.state = this.FRIED;
+            gameState.layers[Layers.STOVE].sprites.filter(sprite => sprite.name !== Names.FIRE);
+          }
+        } else {
+          this[this.state].timer--;
+        }
+        return true;
+      }
+      return false;
+    },
     states: {
       INITIAL: {
+        name: Names.MINCED_BEEF,
+        description: '',
         x: 100,
         y: 430,
         sourceWidth: 565,
         sourceHeight: 175,
         sourceX: 1938,
         sourceY: 615,
-        sprites: [
-          craftSprite({
-            ...base,
-            states: {
-              INITIAL: {
-                x: 2,
-                y: 75,
-                sourceWidth: 562,
-                sourceHeight: 105,
-                sourceX: 3030,
-                sourceY: 1889,
-                [Displays.STORED]: {
-                  sourceHeight: 135,
-                },
-                [Displays.EXAMINED]: {
-                  sourceHeight: 135,
-                },
-              },
-            }
-          }),
-        ],
+        sprites: [frontPlate],
         [Displays.STORED]: {
           scale: 0.15,
           sourceHeight: 220,
@@ -405,19 +450,51 @@ function loadFreezer(tilesheet) {
           sourceHeight: 220,
         },
       },
-      RAW_MEATBALL: {
+      RAW: {
         name: Names.RAW_MEATBALL,
+        description: 'Mixture shaped using meatball clamp',
+        x: 400,
+        y: 295,
         sourceX: 1951,
         sourceY: 1241,
         sourceWidth: 214,
         sourceHeight: 127,
+        defaultTimer: 100,
+        timer: 100,
         [Displays.STORED]: {
+          scale: 0.2,
+          sourceX: 1957,
+          sourceY: 843,
+          sourceWidth: 425,
+          sourceHeight: 394,
+        },
+        [Displays.EXAMINED]: {
           sourceX: 1957,
           sourceY: 843,
           sourceWidth: 425,
           sourceHeight: 394,
         }
       },
+      HALF_FRIED: {
+        name: Names.HALF_FRIED_MEATBALL,
+        x: 450,
+        y: 300,
+        sourceWidth: 218,
+        sourceHeight: 124,
+        sourceX: 2180,
+        sourceY: 1247,
+        defaultTimer: 100,
+        timer: 100,
+      },
+      FRIED: {
+        name: Names.FRIED_MEATBALL,
+        x: 500,
+        y: 330,
+        sourceWidth: 218,
+        sourceHeight: 124,
+        sourceX: 2449,
+        sourceY: 1251,
+      }
     }
   });
   return [
