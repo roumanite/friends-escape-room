@@ -16,6 +16,11 @@ function launch() {
     subtitle: '',
     page: 1,
     gameOver: false,
+    withAnimation: false,
+    navigateTo: function(layer) {
+      this.currentRoom = layer;
+      this.withAnimation = false;
+    }
   };
 
   inventory.perPage = Math.floor(
@@ -136,33 +141,53 @@ function launch() {
   const leftArrow = document.getElementsByClassName("left-arrow")[0]
   leftArrow.addEventListener("click", function(e) {
     if (gameState.layers[gameState.currentRoom].previous !== undefined) {
-      gameState.currentRoom = gameState.layers[gameState.currentRoom].previous;
-      render();
+      // Store the value beforehand since navigateTo will alter the value
+      const withAnimation = gameState.withAnimation;
+      gameState.navigateTo(gameState.layers[gameState.currentRoom].previous);
+      if (!withAnimation) {
+        render();
+      }
     }
   }, false)
   const rightArrow = document.getElementsByClassName("right-arrow")[0]
   rightArrow.addEventListener("click", function(e) {
     if (gameState.layers[gameState.currentRoom].next !== undefined) {
-      gameState.currentRoom = gameState.layers[gameState.currentRoom].next
-      render();
+      // Store the value beforehand since navigateTo will alter the value
+      const withAnimation = gameState.withAnimation;
+      gameState.navigateTo(gameState.layers[gameState.currentRoom].next);
+      if (!withAnimation) {
+        render();
+      }
     }
   }, false)
 
   canvas.addEventListener("click", handleCanvasClick);
 
   function handleCanvasClick(e) {
+    // Store the value beforehand since click scenarios will alter the value
+    const withAnimation = gameState.withAnimation;
+    handleClickScenarios(e);
+
+    if (inventory.numOfItems(gameState.inventoryItems.length, gameState.page) === 0 && gameState.page > 1) {
+      gameState.page -= 1;
+    }
+
+    if (!withAnimation) {
+      render();
+    }
+  }
+
+  function handleClickScenarios(e) {
     const x = e.pageX - canvas.offsetLeft - canvas.clientLeft;
     const y = e.pageY - canvas.offsetTop - canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
     if (isWithinRectBounds(x, y, 0, 677, 955, 100)) {
       if (isWithinRectBounds(x, y, inventory.prevArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
         gameState.page -= 1;
-        render();
         return;
       }
       if (isWithinRectBounds(x, y, inventory.nextArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
         gameState.page += 1;
-        render();
         return;
       }
 
@@ -180,8 +205,6 @@ function launch() {
           } else {
             gameState.selectedInventoryItem = sprite;
           }
-          
-          render();
           return;
         }
       }
@@ -192,7 +215,6 @@ function launch() {
         || !isWithinRectBounds(x, y, magnifier.margin, magnifier.margin, canvas.width - magnifier.margin * 2, canvas.height - inventory.slot.margin * 2 - inventory.slot.height - magnifier.margin * 2)
       ) {
         gameState.examinedInventoryItem = null;
-        render();
         return;
       }
       if (gameState.selectedInventoryItem) {
@@ -200,7 +222,6 @@ function launch() {
           gameState.selectedInventoryItem.onClick(x, y, gameState);
         }
         gameState.selectedInventoryItem = null;
-        render();
       }
       return;
     }
@@ -211,7 +232,6 @@ function launch() {
       const topOffset = canvas.height - inventory.slot.margin * 2 - inventory.slot.height - height;
       if (isWithinRectBounds(x, y, canvas.width - subtitleBox.exit.width, topOffset + subtitleBox.padding, subtitleBox.exit.width, subtitleBox.exit.height)) {
         gameState.subtitle = '';
-        render();
         return;
       } else if (isWithinRectBounds(x, y, 0, topOffset, canvas.width, height)) {
         return;
@@ -226,7 +246,6 @@ function launch() {
       }
     }
     gameState.selectedInventoryItem = null;
-    render();
   }
 
   function handleTilesheetOnload(layerInfo) {
@@ -252,7 +271,7 @@ function launch() {
 
     if (gameState.gameOver) {
       renderCredits();
-      window.removeEventListener('click', handleCanvasClick);
+      canvas.removeEventListener('click', handleCanvasClick);
       return;
     }
     renderNavigationArrows();
@@ -320,6 +339,7 @@ function launch() {
   }
 
   function renderLayer() {
+    let withAnimation = false;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
     sprites.forEach(sprite => {
       if (typeof sprite.img !== "object") {
@@ -332,6 +352,9 @@ function launch() {
             mini[mini.state].sourceWidth, mini[mini.state].sourceHeight,
             mini[mini.state].rotation, mini[mini.state].scale * sprite[sprite.state].scale,
           );
+          if (mini.update(gameState)) {
+            withAnimation = true;
+          }
         });
       } else {
         renderSprite(
@@ -351,13 +374,23 @@ function launch() {
             extra[extra.state].sourceWidth, extra[extra.state].sourceHeight,
             extra[extra.state].rotation, extra[extra.state].scale,
           );
+          if (extra.update(gameState)) {
+            withAnimation = true;
+          }
         });
       }
 
       if (sprite.update(gameState)) {
-        window.requestAnimationFrame(render);
+        withAnimation = true;
       }
     });
+
+    if (withAnimation) {
+      gameState.withAnimation = true;
+      window.requestAnimationFrame(render);
+    } else {
+      gameState.withAnimation = false;
+    }
   }
 
   function renderMagnifier() {

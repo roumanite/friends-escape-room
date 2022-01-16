@@ -56,7 +56,11 @@ function loadBathroom(tilesheet) {
     {
       ...base,
       onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
+        const item = gameState.selectedInventoryItem;
+        if (this.state === this.INITIAL
+          && isWithinRectBounds(x, y, 508, 511, 101, 29)
+          && item && item.name === Names.HANDYMAN_TOOL
+        ) {
           gameState.layers[gameState.currentRoom].sprites.push(key);
           this.state = this.FINAL;
           return true;
@@ -91,7 +95,7 @@ function loadBathroom(tilesheet) {
         if (bdWhitePlacement || bdBlackPlacement || bdBrownPlacement) {
           item.state = item.FINAL;
           
-          gameState.inventoryItems = gameState.inventoryItems.filter(sprite => sprite !== item);
+          removeOnce(gameState.inventoryItems, item);
           
           gameState.layers[gameState.currentRoom].sprites.push(item);
           if ([Names.BABY_DOLL_WHITE, Names.BABY_DOLL_BLACK, Names.BABY_DOLL_BROWN].every(baby => gameState.layers[gameState.currentRoom].sprites.findIndex(sprite => sprite.name === baby) > -1)) {

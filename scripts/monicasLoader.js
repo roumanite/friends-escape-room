@@ -5,24 +5,24 @@ function loadMonicas(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
           if (isWithinRectBounds(x, y, 28, 5, 166, 369)) {
-            gameState.currentRoom = Layers.LIVING_ROOM;
+            gameState.navigateTo(Layers.LIVING_ROOM);
             return true;
           }
           if (isWithinRectBounds(x, y, 224, 281, 143, 42)) {
-            gameState.currentRoom = Layers.MONICAS_GREEN_DRAWER_1;
+            gameState.navigateTo(Layers.MONICAS_GREEN_DRAWER_1);
             return true;
           }
           if (isWithinRectBounds(x, y, 226, 319, 138, 43)) {
-            gameState.currentRoom = Layers.MONICAS_GREEN_DRAWER_2;
+            gameState.navigateTo(Layers.MONICAS_GREEN_DRAWER_2);
             return true;
           }
           if (isWithinRectBounds(x, y, 0, 436, 188, 237)
             || isWithinRectBounds(x, y, 204, 374, 129, 122)) {
-            gameState.currentRoom = Layers.BIG_BOX;
+            gameState.navigateTo(Layers.BIG_BOX);
             return true;
           }
           if (isWithinRectBounds(x, y, 760, 262, 158, 46)) {
-            gameState.currentRoom = Layers.MONICAS_WHITE_DRAWER;
+            gameState.navigateTo(Layers.MONICAS_WHITE_DRAWER);
             return true;
           }
           if (isWithinRectBounds(x, y, 750, 194, 131, 65)) {
@@ -261,12 +261,24 @@ function loadBigBox(tilesheet) {
   const base = { img: tilesheet };
   const glasses = craftSprite({
     ...base,
+    onClick: pickUp,
     states: {
       INITIAL: {
+        name: Names.CHANDLER_GLASSES,
         sourceWidth: 440,
         sourceHeight: 223,
         sourceX: 1478,
         sourceY: 1317,
+        rotation: 90,
+        x: 50,
+        y: 200,
+        [Displays.STORED]: {
+          rotation: 0,
+          scale: 0.2,
+        },
+        [Displays.EXAMINED]: {
+          rotation: 0,
+        }
       }
     }
   });

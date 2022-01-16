@@ -21,19 +21,20 @@ const Layers = {
   BOTTOM_FRIDGE: 7,
 
   LIVING_ROOM: 8,
+  LAPTOP: 9,
 
-  MONICAS_ROOM: 9,
-  MONICAS_GREEN_DRAWER_1: 10,
-  MONICAS_GREEN_DRAWER_2: 11,
-  MONICAS_WHITE_DRAWER: 12,
-  BIG_BOX: 13,
+  MONICAS_ROOM: 10,
+  MONICAS_GREEN_DRAWER_1: 11,
+  MONICAS_GREEN_DRAWER_2: 12,
+  MONICAS_WHITE_DRAWER: 13,
+  BIG_BOX: 14,
 
-  GUEST_ROOM: 14,
-  GUEST_WHITE_DRAWER_1: 15,
-  GUEST_WHITE_DRAWER_2: 16,
-  GUEST_WHITE_DRAWER_3: 17,
+  GUEST_ROOM: 15,
+  GUEST_WHITE_DRAWER_1: 16,
+  GUEST_WHITE_DRAWER_2: 17,
+  GUEST_WHITE_DRAWER_3: 18,
 
-  BATHROOM: 18,
+  BATHROOM: 19,
 };
 
 const Names = {
@@ -43,14 +44,19 @@ const Names = {
 
   // Kitchen
   MINCED_BEEF: 'Minced Beef',
-  RAW_MEATBALL: 'Raw Meatball',
-  HALF_FRIED_MEATBALL: 'Half Cooked Meatball',
-  FRIED_MEATBALL: 'Fried Meatball',
+  RAW_MEATBALLS: 'Raw Meatballs',
+  HALF_FRIED_MEATBALLS: 'Half Cooked Meatballs',
+  FRIED_MEATBALLS: 'Fried Meatballs',
+  MEATBALLS_ON_BREAD: 'Meatballs on Bread',
+  MEATBALLS_ON_BREAD_WITH_MARINARA: 'Meatballs on Bread with Marinara Sauce',
+  MEATBALLS_ON_BREAD_WITH_MARINARA_CHEESE: 'Meatballs on Bread with Marinara Sauce and Mozarella Cheese',
+  MEATBALL_SUB: 'Meatball Sub',
   MOZARELLA_CHEESE: 'Mozarella Cheese',
   FRYING_PAN: 'Frying Pan',
   FIRE: 'Fire',
   HANDYMAN_TOOL: 'Handyman Tool',
   SPICES: 'Spices',
+  BREAD_ROLLS: 'Bread Rolls',
 
   // Living room items
   TABLE: 'Table',
@@ -58,7 +64,7 @@ const Names = {
   EGG: 'Egg',
   BABY_DOLL_WHITE: 'Baby doll wearing white',
   MEATBALL_CLAMP: 'Meatball Clamp',
-  MARINARA_SAUCE: 'Marinara Sauce', // Half the taste is in the smell
+  MARINARA_SAUCE: 'Marinara Sauce',
   CHANDLER_FIGURINE: 'Chandler Bing Figurine',
 
   // Monica's room items

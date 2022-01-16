@@ -15,9 +15,8 @@ function loadLivingRoom(tilesheet) {
           x: 735,
           y: 520,
           scale: 0.2,
-          [Displays.STORED]: {
-            scale: 0.15,
-          },
+          [Displays.STORED]: { scale: 0.15 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
       }
     },
@@ -28,11 +27,11 @@ function loadLivingRoom(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
         if (isWithinRectBounds(x, y, 168, 0, 215, 383)) {
-          gameState.currentRoom = Layers.MONICAS_ROOM;
+          gameState.navigateTo(Layers.MONICAS_ROOM);
           return true;
         }
         if (isWithinRectBounds(x, y, 720, 0, 210, 317)) {
-          gameState.currentRoom = Layers.GUEST_ROOM;
+          gameState.navigateTo(Layers.GUEST_ROOM);
           return true;
         }
         const item = gameState.selectedInventoryItem;
@@ -140,7 +139,7 @@ function loadLivingRoom(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
         if (this[this.state].isWithinBounds(x, y)) {
-          gameState.currentRoom = Layers.LAPTOP;
+          gameState.navigateTo(Layers.LAPTOP);
           return true;
         }
       },

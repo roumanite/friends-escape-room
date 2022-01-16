@@ -16,6 +16,7 @@ function loadEntrance(tilesheet) {
             const beachStuff = [
               Names.CHANDLER_GLASSES,
               Names.MIDORI,
+              Names.PHOEBE_GUITAR,
             ];
             if (beachStuff.every(name => gameState.inventoryItems.findIndex(item => item.name === name) > -1)) {
               gameState.gameOver = true;

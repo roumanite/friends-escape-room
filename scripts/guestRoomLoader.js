@@ -5,19 +5,19 @@ function loadGuestRoom(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
         if (isWithinRectBounds(x, y, 24, 0, 167, 489)) {
-          gameState.currentRoom = Layers.LIVING_ROOM;
+          gameState.navigateTo(Layers.LIVING_ROOM);
           return true;
         }
         if (isWithinRectBounds(x, y, 227, 218, 317, 51)) {
-          gameState.currentRoom = Layers.GUEST_WHITE_DRAWER_1;
+          gameState.navigateTo(Layers.GUEST_WHITE_DRAWER_1);
           return true;
         }
         if (isWithinRectBounds(x, y, 233, 273, 307, 50)) {
-          gameState.currentRoom = Layers.GUEST_WHITE_DRAWER_2;
+          gameState.navigateTo(Layers.GUEST_WHITE_DRAWER_2);
           return true;
         }
         if (isWithinRectBounds(x, y, 231, 331, 311, 57)) {
-          gameState.currentRoom = Layers.GUEST_WHITE_DRAWER_3;
+          gameState.navigateTo(Layers.GUEST_WHITE_DRAWER_3);
           return true;
         }
       },
@@ -34,14 +34,7 @@ function loadGuestRoom(tilesheet) {
     },
     { // Breadcrumbs
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.BREADCRUMBS,
@@ -149,14 +142,7 @@ function loadGuestRoom(tilesheet) {
     },
     { // Shining book
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.THE_SHINING,
@@ -389,7 +375,7 @@ function loadGuestWhiteDrawer2(tilesheet) {
         },
         FINAL: {
           x: 508,
-          y: 365,
+          y: 368,
           sourceWidth: 314,
           sourceHeight: 118,
           sourceX: 1020,

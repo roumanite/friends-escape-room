@@ -1,31 +1,58 @@
 function loadKitchen(tilesheet) {
   const base = { img: tilesheet };
+  const fire = craftSprite(
+    {
+      ...base,
+      update: function(gameState) {
+        if (this[this.state].x > 565) {
+          this[this.state].goingRight = false;
+        }
+        if (this[this.state].x < 555) {
+          this[this.state].goingRight = true;
+        }
+        this[this.state].x = this[this.state].goingRight ? this[this.state].x + 1 : this[this.state].x - 1;
+        return true;
+      },
+      states: {
+        INITIAL: {
+          name: Names.FIRE,
+          x: 559,
+          y: 490,
+          sourceWidth: 202,
+          sourceHeight: 79,
+          sourceX: 2355,
+          sourceY: 300,
+          goingRight: true,
+        }
+      },
+    }
+  );
   return [
     { // Kitchen background
       ...base,
       onClick: function(x, y, gameState) {
         if (isWithinRectBounds(x, y, 163, 317, 95, 41)) {
-          gameState.currentRoom = Layers.KITCHEN_BLUE_DRAWER_1;
+          gameState.navigateTo(Layers.KITCHEN_BLUE_DRAWER_1);
           return true;
         }
         if (isWithinRectBounds(x, y, 271, 318, 87, 42)) {
-          gameState.currentRoom = Layers.KITCHEN_BLUE_DRAWER_2;
+          gameState.navigateTo(Layers.KITCHEN_BLUE_DRAWER_2);
           return true;
         }
         if (isWithinRectBounds(x, y, 643, 148, 146, 160)) {
-          gameState.currentRoom = Layers.FREEZER;
+          gameState.navigateTo(Layers.FREEZER);
           return true;
         }
         if (isWithinRectBounds(x, y, 630, 378, 157, 291)) {
-          gameState.currentRoom = Layers.BOTTOM_FRIDGE;
+          gameState.navigateTo(Layers.BOTTOM_FRIDGE);
           return true;
         }
         if (isWithinRectBounds(x, y, 0, 177, 164, 125)) {
-          gameState.currentRoom = Layers.STOVE;
+          gameState.navigateTo(Layers.STOVE);
           return true;
         }
         if (isWithinRectBounds(x, y, 0, 307, 165, 149)) {
-          gameState.currentRoom = Layers.OVEN;
+          gameState.navigateTo(Layers.OVEN);
           return true;
         }
       },
@@ -60,7 +87,9 @@ function loadKitchen(tilesheet) {
           return true;
         }
         
-        if (item && item.name === Names.RAW_MEATBALL && this[this.state].isWithinBounds(x, y)) {
+        if (item && item.name === Names.RAW_MEATBALLS
+          && gameState.layers[gameState.currentRoom].sprites.find(sprite => sprite.name === Names.FIRE)
+          && this[this.state].isWithinBounds(x, y)) {
           removeOnce(gameState.inventoryItems, item);
           gameState.layers[gameState.currentRoom].sprites.push(item);
           return true;
@@ -99,6 +128,23 @@ function loadKitchen(tilesheet) {
           sourceY: 0,
         }
       },
+    },
+    {
+      ...base,
+      onClick: pickUp,
+      states: {
+        INITIAL: {
+          name: Names.BREAD_ROLLS,
+          x: 215,
+          y: 25,
+          sourceWidth: 487,
+          sourceHeight: 307,
+          sourceX: 2414,
+          sourceY: 912,
+          scale: 0.15,
+          [Displays.EXAMINED]: { scale: 1 },
+        },
+      }
     },
     { // Handyman tool
       ...base,
@@ -144,7 +190,7 @@ function loadKitchen(tilesheet) {
         }
       },
     }
-  ].map(props => craftSprite(props));
+  ].map(props => craftSprite(props))//.concat(fire);
 }
 
 function loadStove(tilesheet) {
@@ -225,6 +271,10 @@ function loadOven(tilesheet) {
     update: function(gameState) {
       if (this.state === this.LOCKED) {
         if (this[this.state].timer === 0) {
+          const sub = gameState.layers[gameState.currentRoom].sprites.find(sprite => sprite.name === Names.MEATBALLS_ON_BREAD_WITH_MARINARA_CHEESE);
+          if (sub) {
+            sub.state = sub.FINAL;
+          }
           this[this.state].timer = this[this.state].defaultTimer;
           this.state = this.INITIAL;
         } else {
@@ -273,6 +323,18 @@ function loadOven(tilesheet) {
             return true;
           } else if (door.state !== door.LOCKED) {
             gameState.subtitle = 'Close the door first';
+            return true;
+          }
+        }
+
+        const item = gameState.selectedInventoryItem;
+        if (isWithinRectBounds(x, y, 100, 118, 744, 417)
+          && item && item.name === Names.MEATBALLS_ON_BREAD_WITH_MARINARA_CHEESE
+        ) {
+          removeOnce(gameState.inventoryItems, item);
+          const idx = gameState.layers[gameState.currentRoom].sprites.indexOf(door);
+          if (idx > -1) {
+            gameState.layers[gameState.currentRoom].sprites.splice(idx, 0, item);
             return true;
           }
         }
@@ -370,48 +432,80 @@ function loadFreezer(tilesheet) {
   const mincedBeef = craftSprite({
     ...base,
     onClick: function(x, y, gameState) {
-      if (this.state === this.INITIAL) {
-        if (pickUp.bind(this)(x, y, gameState)) {
-          return true;
-        }
+      switch(this.state) {
+        case this.INITIAL:
+          if (pickUp.bind(this)(x, y, gameState)) {
+            return true;
+          }
 
-        const sprites = Array(mixture.length).fill(null).concat(frontPlate);
-        let shouldRender = false;
-        mixture.forEach((ingredientName, i) => {
-          const ingredient = combo(gameState, this, ingredientName);
+          const sprites = Array(mixture.length).fill(null).concat(frontPlate);
+          let shouldRender = false;
+          mixture.forEach((ingredientName, i) => {
+            const ingredient = combo(gameState, this, ingredientName);
+            if (ingredient) {
+              shouldRender = true;
+              ingredient.state = ingredient.FINAL;
+              removeOnce(gameState.inventoryItems, ingredient);
+              if (this[this.state].sprites.length > 0) {
+                this[this.state].description += ' ';
+              }
+              this[this.state].description += `+ ${ingredient.name}`;
+              sprites[i] = ingredient;
+              gameState.examinedInventoryItem = this;
+            } else {
+              const sprite = this[this.state].sprites.find(sprite => sprite.name === ingredientName);
+              if (sprite) {
+                sprites[i] = sprite;
+              }
+            }
+          });
+          if (shouldRender) {
+            this[this.state].sprites = sprites.filter(sprite => sprite);
+            return true;
+          }
+          if (this[this.state].sprites.length === mixture.length + 1) {
+            const clamp = combo(gameState, this, Names.MEATBALL_CLAMP);
+            if (clamp) {
+              this.state = this.RAW;
+              gameState.examinedInventoryItem = this;
+              return true;
+            }
+          }
+          break;
+        case this.FRIED:
+          if (pickUp.bind(this)(x, y, gameState, this.state)) {
+            gameState.layers[Layers.STOVE].sprites = gameState.layers[Layers.STOVE].sprites.filter(sprite => sprite.name !== Names.FIRE);
+            return true;
+          }
+          const ingredient = combo(gameState, this, Names.BREAD_ROLLS);
           if (ingredient) {
-            shouldRender = true;
-            ingredient.state = ingredient.FINAL;
             removeOnce(gameState.inventoryItems, ingredient);
-            if (this[this.state].sprites.length > 0) {
-              this[this.state].description += ' ';
-            }
-            this[this.state].description += `+ ${ingredient.name}`;
-            sprites[i] = ingredient;
             gameState.examinedInventoryItem = this;
-          } else {
-            const sprite = this[this.state].sprites.find(sprite => sprite.name === ingredientName);
-            if (sprite) {
-              sprites[i] = sprite;
-            }
+            this.state = this.ON_BREAD;
+            return true;
           }
-        });
-        if (shouldRender) {
-          this[this.state].sprites = sprites.filter(sprite => sprite);
-          return true;
-        }
-        if (this[this.state].sprites.length === mixture.length + 1) {
-          const clamp = combo(gameState, this, Names.MEATBALL_CLAMP);
-          if (clamp) {
-            this.state = this.RAW;
+          break;
+        case this.ON_BREAD:
+          if (combo(gameState, this, Names.MARINARA_SAUCE)) {
+            this.state = this.ON_BREAD_WITH_MARINARA;
+            gameState.examinedInventoryItem = this;
+            return true;
           }
-        }
+          break;
+        case this.ON_BREAD_WITH_MARINARA:
+          const cheese = combo(gameState, this, Names.MOZARELLA_CHEESE);
+          if (cheese) {
+            removeOnce(gameState.inventoryItems, cheese);
+            this.state = this.ON_BREAD_WITH_MARINARA_CHEESE;
+            gameState.examinedInventoryItem = this;
+            return true;
+          }
+          break;
+        default:
       }
 
-      if (this.state === this.FRIED) {
-        if (pickUp.bind(this)(x, y, gameState, this.state)) {
-          return true;
-        }
+      if (pickUp.bind(this)(x, y, gameState, this.FINAL)) {
+        return true;
       }
     },
     update: function(gameState) {
@@ -422,7 +516,7 @@ function loadFreezer(tilesheet) {
             this.state = this.HALF_FRIED;
           } else {
             this.state = this.FRIED;
-            gameState.layers[Layers.STOVE].sprites.filter(sprite => sprite.name !== Names.FIRE);
+            gameState.layers[Layers.STOVE].sprites = gameState.layers[Layers.STOVE].sprites.filter(sprite => sprite.name !== Names.FIRE);
           }
         } else {
           this[this.state].timer--;
@@ -451,10 +545,10 @@ function loadFreezer(tilesheet) {
         },
       },
       RAW: {
-        name: Names.RAW_MEATBALL,
+        name: Names.RAW_MEATBALLS,
         description: 'Mixture shaped using meatball clamp',
-        x: 400,
-        y: 295,
+        x: 550,
+        y: 360,
         sourceX: 1951,
         sourceY: 1241,
         sourceWidth: 214,
@@ -476,9 +570,9 @@ function loadFreezer(tilesheet) {
         }
       },
       HALF_FRIED: {
-        name: Names.HALF_FRIED_MEATBALL,
-        x: 450,
-        y: 300,
+        name: Names.HALF_FRIED_MEATBALLS,
+        x: 550,
+        y: 360,
         sourceWidth: 218,
         sourceHeight: 124,
         sourceX: 2180,
@@ -487,13 +581,69 @@ function loadFreezer(tilesheet) {
         timer: 100,
       },
       FRIED: {
-        name: Names.FRIED_MEATBALL,
-        x: 500,
-        y: 330,
+        name: Names.FRIED_MEATBALLS,
+        x: 550,
+        y: 360,
         sourceWidth: 218,
         sourceHeight: 124,
         sourceX: 2449,
         sourceY: 1251,
+        [Displays.STORED]: {
+          scale: 0.2,
+          sourceWidth: 370,
+          sourceHeight: 240,
+          sourceX: 2974,
+          sourceY: 698,
+        },
+        [Displays.EXAMINED]: {
+          sourceWidth: 370,
+          sourceHeight: 240,
+          sourceX: 2974,
+          sourceY: 698,
+        }
+      },
+      ON_BREAD: {
+        name: Names.MEATBALLS_ON_BREAD,
+        sourceX: 2497,
+        sourceY: 1511,
+        sourceWidth: 494,
+        sourceHeight: 490,
+        [Displays.STORED]: { scale: 0.19 },
+        [Displays.EXAMINED]: { scale: 0.9 },
+      },
+      ON_BREAD_WITH_MARINARA: {
+        name: Names.MEATBALLS_ON_BREAD_WITH_MARINARA,
+        sourceX: 2941,
+        sourceY: 974,
+        sourceWidth: 497,
+        sourceHeight: 495,
+        [Displays.STORED]: { scale: 0.19 },
+        [Displays.EXAMINED]: { scale: 0.9 },
+      },
+      ON_BREAD_WITH_MARINARA_CHEESE: {
+        name: Names.MEATBALLS_ON_BREAD_WITH_MARINARA_CHEESE,
+        x: 300,
+        y: 123,
+        scale: 0.5,
+        sourceWidth: 489,
+        sourceHeight: 405,
+        sourceX: 2997,
+        sourceY: 1476,
+        [Displays.STORED]: { scale: 0.19 },
+        [Displays.EXAMINED]: { scale: 0.9 },
+      },
+      FINAL: {
+        name: Names.MEATBALL_SUB,
+        description: "Half the taste is in the smell",
+        x: 300,
+        y: 123,
+        scale: 0.5,
+        sourceX: 3448,
+        sourceY: 1024,
+        sourceWidth: 496,
+        sourceHeight: 410,
+        [Displays.STORED]: { scale: 0.19 },
+        [Displays.EXAMINED]: { scale: 0.9 },
       }
     }
   });
@@ -569,15 +719,10 @@ function loadBottomFridge(tilesheet) {
     },
     {
       ...base, // Mozarella cheese
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
+          name: Names.MOZARELLA_CHEESE,
           description: "I'm not great with the advice. Can I interest you with a sarcastic comment? Some cheese?",
           x: 340,
           y: 355,
