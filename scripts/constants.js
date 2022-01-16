@@ -82,6 +82,7 @@ const Names = {
   // Bathroom
   KEY: 'Apartment key',
   PHOEBE_GUITAR: "Phoebe's guitar",
+  SAFE_BOX: "Safe box",
 };
 
 const base =

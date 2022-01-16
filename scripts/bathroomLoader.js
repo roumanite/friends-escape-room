@@ -113,9 +113,14 @@ function loadBathroom(tilesheet) {
     },
     {
       ...base,
-      onClick: pickUp,
+      onClick: function(x, y, gameState) {
+        if (pickUp.bind(this)(x, y, gameState)) {
+          return true;
+        }
+      },
       states: {
         INITIAL: {
+          name: Names.SAFE_BOX,
           sourceWidth: 104,
           sourceHeight: 106,
           sourceX: 582,
@@ -124,6 +129,13 @@ function loadBathroom(tilesheet) {
           y: 283,
           [Displays.STORED]: {
             scale: 0.8,
+          },
+          [Displays.EXAMINED]: {
+            sourceWidth: 955,
+            sourceHeight: 677,
+            sourceX: 1000,
+            sourceY: 0,
+            scale: 0.7,
           },
         },
       }
