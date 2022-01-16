@@ -118,14 +118,8 @@ spriteObject[spriteObject.INITIAL] = {
   sourceHeight: 0,
   scale: 1,
   rotation: 0,
-  [Displays.STORED]: {
-    scale: 1,
-    rotation: 0,
-  },
-  [Displays.EXAMINED]: {
-    scale: 1,
-    rotation: 0,
-  },
+  [Displays.STORED]: {},
+  [Displays.EXAMINED]: {},
   isWithinBounds: function(x, y) {
     return isWithinRectBounds(x, y, this.x, this.y, this.sourceWidth * this.scale, this.sourceHeight * this.scale);
   },

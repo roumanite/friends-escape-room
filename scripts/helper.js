@@ -37,23 +37,34 @@ craftSprite = (props) => {
   let sprite = clone(spriteObject);
 
   const { states, ...extendedSprite } = props;
+  // img, onClick, update
   Object.entries(extendedSprite).forEach(([key, value], i) => {
     sprite[key] = value;
   });
+  // states
   Object.entries(states).forEach(([stateName, stateProps], i) => {
     sprite[stateName] = i;
 
-    const extStateProps = { ...stateProps };
-    Object.entries(stateProps).forEach(([k, v]) => {
+    const extStateProps = { ...spriteObject[spriteObject.INITIAL], ...stateProps };
+    // Displays.STORED and EXAMINED
+    Object.entries(extStateProps).forEach(([k, v]) => {
       if (typeof v === "object" && spriteObject[spriteObject.INITIAL].hasOwnProperty(k)) {
         extStateProps[k] = {
           ...spriteObject[spriteObject.INITIAL][k],
+          x: extStateProps.x,
+          y: extStateProps.y,
+          sourceX: extStateProps.sourceX,
+          sourceY: extStateProps.sourceY,
+          sourceWidth: extStateProps.sourceWidth,
+          sourceHeight: extStateProps.sourceHeight,
+          scale: extStateProps.scale,
+          rotation: extStateProps.rotation,
           ...v,
         };
+        
       }
     });
-
-    sprite[i] = { ...spriteObject[spriteObject.INITIAL], ...extStateProps};
+    sprite[i] = extStateProps;
   });
   return sprite;
 }

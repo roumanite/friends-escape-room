@@ -113,9 +113,8 @@ function loadKitchen(tilesheet) {
           sourceX: 2549,
           sourceY: 630,
           scale: 0.2,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 },
         }
       },
     },
@@ -132,9 +131,8 @@ function loadKitchen(tilesheet) {
           sourceX: 2592,
           sourceY: 294,
           scale: 0.1,
-          [Displays.STORED]: {
-            scale: 0.27,
-          },
+          [Displays.STORED]: { scale: 0.27 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           name: Names.MIXED_SPICES,

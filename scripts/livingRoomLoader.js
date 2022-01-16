@@ -175,6 +175,11 @@ function loadLivingRoom(tilesheet) {
           rotation: 90,
           [Displays.STORED]: {
             scale: 0.17,
+            rotation: 0,
+          },
+          [Displays.EXAMINED]: {
+            scale: 1,
+            rotation: 0,
           },
         },
         FINAL: {

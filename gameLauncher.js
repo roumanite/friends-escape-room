@@ -267,7 +267,7 @@ function launch() {
     ctx.fillText("Enjoy a fun day at the beach!", 100, 150);
     ctx.fillText("Thanks to David Crane & Marta Kauffman,", 100, 300);
     ctx.fillText("creator of FRIENDS for inspiring this project", 100, 350);
-    ctx.fillText("art & program by roumanite", 100, 500);
+    ctx.fillText("art, program, puzzle by roumanite", 100, 500);
     ctx.fillText("feedback or bug reports welcomed", 100, 550);
     ctx.font = '25px Arial';
     ctx.fillText("https://www.reddit.com/user/roumanite", 100, 600);
@@ -321,18 +321,16 @@ function launch() {
 
   function renderLayer() {
     const sprites = gameState.layers[gameState.currentRoom].sprites;
-    for(let i = 0; i < sprites.length; i++)
-    {
-      const sprite = sprites[i];
+    sprites.forEach(sprite => {
       if (typeof sprite.img !== "object") {
         const miniSprites = gameState.layers[sprite.img].sprites;
         miniSprites.forEach(mini => {
-          ctx.drawImage(
+          renderSprite(
             mini.img,
-            mini[mini.state].sourceX, mini[mini.state].sourceY, 
+            sprite[sprite.state].scale * mini[mini.state].x + sprite[sprite.state].x, sprite[sprite.state].scale * mini[mini.state].y + sprite[sprite.state].y,
+            mini[mini.state].sourceX, mini[mini.state].sourceY,
             mini[mini.state].sourceWidth, mini[mini.state].sourceHeight,
-            sprite[sprite.state].scale * mini[mini.state].x + sprite[sprite.state].x, sprite[sprite.state].scale * mini[mini.state].y + sprite[sprite.state].y, 
-            sprite[sprite.state].scale * mini[mini.state].scale * mini[mini.state].sourceWidth, sprite[sprite.state].scale * mini[mini.state].scale * mini[mini.state].sourceHeight,
+            mini[mini.state].rotation, mini[mini.state].scale * sprite[sprite.state].scale,
           );
         });
       } else {
@@ -344,7 +342,7 @@ function launch() {
           sprite[sprite.state].rotation, sprite[sprite.state].scale,
         );
       }
-      if (sprite[sprite.state].sprites) {  
+      if (sprite[sprite.state].sprites) {
         sprite[sprite.state].sprites.forEach(extra => {
           renderSprite(
             extra.img,
@@ -359,12 +357,13 @@ function launch() {
       if (sprite.update()) {
         window.requestAnimationFrame(render);
       }
-    }
+    });
   }
 
   function renderMagnifier() {
     if (gameState.examinedInventoryItem) {
       const sprite = gameState.examinedInventoryItem;
+      const examinedSprite = sprite[sprite.state][Displays.EXAMINED];
       let topOffset = magnifier.margin + magnifier.padding;
       const leftOffset = magnifier.margin + magnifier.padding;
       
@@ -424,26 +423,22 @@ function launch() {
       );
       ctx.stroke();
 
-      const srcX = sprite[sprite.state][Displays.EXAMINED].sourceX !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceX : sprite[sprite.state].sourceX;
-      const srcY = sprite[sprite.state][Displays.EXAMINED].sourceY !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceY : sprite[sprite.state].sourceY;
-      const srcWidth = sprite[sprite.state][Displays.EXAMINED].sourceWidth !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceWidth : sprite[sprite.state].sourceWidth;
-      const srcHeight = sprite[sprite.state][Displays.EXAMINED].sourceHeight !== undefined ? sprite[sprite.state][Displays.EXAMINED].sourceHeight : sprite[sprite.state].sourceHeight;
-      const width = sprite[sprite.state][Displays.EXAMINED].scale * srcWidth;
-      const height = sprite[sprite.state][Displays.EXAMINED].scale * srcHeight;
+      const width = examinedSprite.scale * examinedSprite.sourceWidth;
+      const height = examinedSprite.scale * examinedSprite.sourceHeight;
       const x = (canvas.width - width)/2;
       const y = (canvas.height - inventory.slot.margin * 2 - inventory.slot.height + topOffset - height)/2;
 
-      ctx.drawImage(
+      renderSprite(
         sprite.img,
-        srcX, srcY,
-        srcWidth, srcHeight,
         x, y,
-        width, height,
+        examinedSprite.sourceX, examinedSprite.sourceY,
+        examinedSprite.sourceWidth, examinedSprite.sourceHeight,
+        examinedSprite.rotation, examinedSprite.scale,
       );
 
       if (sprite[sprite.state].sprites) {  
         sprite[sprite.state].sprites.forEach(extra => {
-          const scale = extra[extra.state].scale * sprite[sprite.state][Displays.EXAMINED].scale;
+          const scale = extra[extra.state].scale * examinedSprite.scale;
           renderSprite(
             extra.img,
             x + extra[extra.state].x * scale, y + extra[extra.state].y * scale,
@@ -466,6 +461,7 @@ function launch() {
 
     for (let i = inventory.perPage * (gameState.page - 1); i < 9 * (gameState.page - 1) + numberOfItems; i++) {
       const sprite = gameState.inventoryItems[i];
+      const storedSprite = sprite[sprite.state][Displays.STORED];
       const x = Math.floor(canvas.width / 2) - (40 * numberOfItems + 5 * (numberOfItems - 1)) + 90 * (i - (gameState.page - 1) * inventory.perPage);
       if (sprite === gameState.selectedInventoryItem) {
         ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.7);
@@ -475,26 +471,22 @@ function launch() {
 
       ctx.fillRect(x, canvas.height - 100 + 10, inventory.slot.width, inventory.slot.height);
 
-      const srcX = sprite[sprite.state][Displays.STORED].sourceX !== undefined ? sprite[sprite.state][Displays.STORED].sourceX : sprite[sprite.state].sourceX;
-      const srcY = sprite[sprite.state][Displays.STORED].sourceY !== undefined ? sprite[sprite.state][Displays.STORED].sourceY : sprite[sprite.state].sourceY;
-      const srcWidth = sprite[sprite.state][Displays.STORED].sourceWidth !== undefined ? sprite[sprite.state][Displays.STORED].sourceWidth : sprite[sprite.state].sourceWidth;
-      const srcHeight = sprite[sprite.state][Displays.STORED].sourceHeight !== undefined ? sprite[sprite.state][Displays.STORED].sourceHeight : sprite[sprite.state].sourceHeight;
-      const width = sprite[sprite.state][Displays.STORED].scale * srcWidth;
-      const height = sprite[sprite.state][Displays.STORED].scale * srcHeight;
+      const width = storedSprite.scale * storedSprite.sourceWidth;
+      const height = storedSprite.scale * storedSprite.sourceHeight;
       const spriteX = x + inventory.slot.width / 2 - width / 2;
       const spriteY = canvas.height - 100 + 10 + inventory.slot.height / 2 - height / 2;
       
       renderSprite(
         sprite.img,
         spriteX, spriteY,
-        srcX, srcY,
-        srcWidth, srcHeight,
-        sprite[sprite.state][Displays.STORED].rotation, sprite[sprite.state][Displays.STORED].scale,
+        storedSprite.sourceX, storedSprite.sourceY,
+        storedSprite.sourceWidth, storedSprite.sourceHeight,
+        storedSprite.rotation, storedSprite.scale,
       )
 
       if (sprite[sprite.state].sprites) {  
         sprite[sprite.state].sprites.forEach(extra => {
-          const scale = extra[extra.state].scale * sprite[sprite.state][Displays.STORED].scale;
+          const scale = extra[extra.state].scale * storedSprite.scale;
           renderSprite(
             extra.img,
             spriteX + extra[extra.state].x * scale, spriteY + extra[extra.state].y * scale,
