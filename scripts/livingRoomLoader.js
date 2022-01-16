@@ -102,12 +102,12 @@ function loadLivingRoom(tilesheet) {
               },
               FINAL: {
                 name: Names.CRACKED_EGG,
-                x: 18,
-                y: 18,
-                sourceWidth: 194,
-                sourceHeight: 186,
-                sourceX: 1332,
-                sourceY: 447,
+                x: 20,
+                y: 3,
+                sourceWidth: 215,
+                sourceHeight: 201,
+                sourceX: 1320,
+                sourceY: 439,
               },
             },
           });

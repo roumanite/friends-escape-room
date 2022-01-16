@@ -56,6 +56,14 @@ function loadGuestRoom(tilesheet) {
             scale: 0.2,
           },
         },
+        FINAL: {
+          x: 200,
+          y: 70,
+          sourceX: 1812,
+          sourceY: 1027,
+          sourceWidth: 136,
+          sourceHeight: 100,
+        },
       }
     },
     { // Big Pillow
@@ -303,7 +311,7 @@ function loadGuestWhiteDrawer1(tilesheet) {
       },
       states: {
         INITIAL: {
-          name: 'Chopped onions',
+          name: Names.CHOPPED_ONIONS,
           x: 180,
           y: 150,
           sourceWidth: 443,
@@ -315,6 +323,15 @@ function loadGuestWhiteDrawer1(tilesheet) {
             scale: 0.15,
           },
         },
+        FINAL: {
+          name: Names.MIXED_ONION,
+          sourceWidth: 266,
+          sourceHeight: 136,
+          sourceX: 1425,
+          sourceY: 760,
+          x: 270,
+          y: 59,
+        }
       },
     },
   ].map(sprite => craftSprite(sprite));

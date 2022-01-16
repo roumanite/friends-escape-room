@@ -76,6 +76,7 @@ const Names = {
   THE_SHINING: 'The Shining',
   BREADCRUMBS: 'Breadcrumbs',
   OTTOMAN: 'The Green Ottoman',
+  CHOPPED_ONIONS: 'Chopped Onions',
   COOKING_OIL: 'Cooking Oil',
   BABY_DOLL_BLACK: 'Baby doll wearing black',
 

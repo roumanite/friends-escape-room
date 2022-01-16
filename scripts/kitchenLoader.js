@@ -343,51 +343,26 @@ function loadBlueDrawer2(tilesheet) {
 }
 
 function loadFreezer(tilesheet) {
-  const base = { img: tilesheet };/*
+  const base = { img: tilesheet };
   const mixture = [
-    {
-      ...base,
-      states: {
-        INITIAL: {
-          name: Names.MIXED_ONION,
-          x: 270,
-          y: 59,
-          sourceWidth: 269,
-          sourceHeight: 133,
-          sourceX: 2530,
-          sourceY: 749,
-        }
-      }
-    }, {
-      ...base,
-    }, 
-     {
-      ...base,
-      states: {
-        INITIAL: {
-          name: Names.MIXED_BREADCRUMBS,
-          x: 200,
-          y: 70,
-          sourceWidth: 142,
-          sourceHeight: 104,
-          sourceX: 2805,
-          sourceY: 756,
-        }
-      }
-    },
-  ].map(sprite => craftSprite(sprite));*/
+    Names.EGG,
+    Names.CHOPPED_ONIONS,
+    Names.BREADCRUMBS,
+    Names.SPICES,
+  ];
   const mincedBeef = craftSprite({
     ...base,
     onClick: function(x, y, gameState) {
       if (this.state === this.INITIAL) {
-        const spices = combo(gameState, this, Names.SPICES)
-          || combo(gameState, this, Names.EGG);
-        if (spices) {
-          spices.state = spices.FINAL;
-          removeOnce(gameState.inventoryItems, spices);
-          this[this.state].sprites.push(spices);
-          gameState.examinedInventoryItem = this;
-          return true;
+        for (let i = 0; i < mixture.length; i++) {
+          const ingredient = combo(gameState, this, mixture[i]);
+          if (ingredient) {
+            ingredient.state = ingredient.FINAL;
+            removeOnce(gameState.inventoryItems, ingredient);
+            this[this.state].sprites.splice(i, 0, ingredient);
+            gameState.examinedInventoryItem = this;
+            return true;
+          }
         }
         
         if (pickUp.bind(this)(x, y, gameState)) {
@@ -410,11 +385,17 @@ function loadFreezer(tilesheet) {
               INITIAL: {
                 x: 2,
                 y: 75,
-                sourceWidth: 560,
+                sourceWidth: 562,
                 sourceHeight: 105,
-                sourceX: 3032,
-                sourceY: 1880,
-              }
+                sourceX: 3030,
+                sourceY: 1889,
+                [Displays.STORED]: {
+                  sourceHeight: 135,
+                },
+                [Displays.EXAMINED]: {
+                  sourceHeight: 135,
+                },
+              },
             }
           }),
         ],
