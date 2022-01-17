@@ -317,8 +317,6 @@ function launch() {
 
   function renderSubtitle() {
     if (gameState.subtitle.trim().length > 0) {
-      console.log(canvas.width - subtitleBox.padding * 2);
-      
       ctx.font = `bold ${subtitleBox.fontSize}px Arial`;
       const lines = getLines(ctx, gameState.subtitle, canvas.width - subtitleBox.padding * 2);
       const height = subtitleBox.calcHeight(lines);

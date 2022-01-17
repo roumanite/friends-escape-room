@@ -14,6 +14,29 @@ function loadKitchen(tilesheet) {
       }
     }
   });
+  const waterDroplet = craftSprite({
+    ...base,
+    update: function(gameState) {
+      if (this[this.state].y >= 300) {
+        this[this.state].y = this[this.state].defaultY;
+      } else {
+        this[this.state].y += 0.2;
+      }
+      return true;
+    },
+    states: {
+      INITIAL: {
+        sourceX: 2760,
+        sourceY: 1262,
+        sourceWidth: 57,
+        sourceHeight: 116,
+        x: 507,
+        y: 279,
+        scale: 0.15,
+        defaultY: 279,
+      }
+    }
+  });
   return [
     { // Kitchen background
       ...base,
@@ -51,11 +74,20 @@ function loadKitchen(tilesheet) {
           gameState.examinedInventoryItem = hat;
           return true;
         }
+        if (isWithinRectBounds(x, y, 500, 224, 60, 55)) {
+          if (this[this.state].sprites.length > 0) {
+            this[this.state].sprites = [];
+          } else {
+            this[this.state].sprites.push(waterDroplet);
+          }
+          return true;
+        }
       },
       states: {
         INITIAL: {
           sourceWidth: 955,
           sourceHeight: 677,
+          sprites: [],
         },
       }
     },

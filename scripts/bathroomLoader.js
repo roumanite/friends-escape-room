@@ -66,6 +66,58 @@ function loadBathroom(tilesheet) {
       }
     }
   });
+  const tapWater = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        x: 738,
+        y: 288,
+        sourceWidth: 101,
+        sourceHeight: 52,
+        sourceX: 1112,
+        sourceY: 1474,
+      }
+    }
+  });
+  const bathtubWater = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        x: 70,
+        y: 258,
+        sourceX: 1221,
+        sourceY: 1467,
+        sourceWidth: 312,
+        sourceHeight: 275,
+      }
+    }
+  });
+  const leftWaterFlow = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        x: 90,
+        y: 338,
+        sourceX: 1610,
+        sourceY: 1471,
+        sourceWidth: 44,
+        sourceHeight: 147,
+      }
+    }
+  });
+  const rightWaterFlow = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        x: 145,
+        y: 295,
+        sourceX: 1610,
+        sourceY: 1471,
+        sourceWidth: 44,
+        sourceHeight: 147,
+      }
+    }
+  });
   return [
     {
       ...base,
@@ -77,6 +129,44 @@ function loadBathroom(tilesheet) {
         ) {
           gameState.layers[gameState.currentRoom].sprites.push(key);
           this.state = this.FINAL;
+          return true;
+        }
+        if (isWithinRectBounds(x, y, 794, 257, 57, 60)) {
+          const water = gameState.layers[gameState.currentRoom].sprites.find(sprite => sprite === tapWater);
+          if (water) {
+            removeOnce(gameState.layers[gameState.currentRoom].sprites, water);
+          } else {
+            gameState.layers[gameState.currentRoom].sprites.push(tapWater);
+          }
+          return true;
+        }
+        const hasLeftWaterFlow = gameState.layers[gameState.currentRoom].sprites.includes(leftWaterFlow);
+        const hasRightWaterFlow = gameState.layers[gameState.currentRoom].sprites.includes(rightWaterFlow);
+        if (isWithinRectBounds(x, y, 53, 279, 61, 89)) {
+          if (hasLeftWaterFlow) {
+            removeOnce(gameState.layers[gameState.currentRoom].sprites, leftWaterFlow);
+            if (!hasRightWaterFlow) {
+              removeOnce(gameState.layers[gameState.currentRoom].sprites, bathtubWater);
+            }
+          } else {
+            gameState.layers[gameState.currentRoom].sprites.push(leftWaterFlow);
+            if (!hasRightWaterFlow) {
+              gameState.layers[gameState.currentRoom].sprites.push(bathtubWater);
+            }
+          }
+          return true;
+        } else if (isWithinRectBounds(x, y, 115, 241, 53, 82)) {
+          if (hasRightWaterFlow) {
+            removeOnce(gameState.layers[gameState.currentRoom].sprites, rightWaterFlow);
+            if (!hasLeftWaterFlow) {
+              removeOnce(gameState.layers[gameState.currentRoom].sprites, bathtubWater);
+            }
+          } else {
+            gameState.layers[gameState.currentRoom].sprites.push(rightWaterFlow);
+            if (!hasLeftWaterFlow) {
+              gameState.layers[gameState.currentRoom].sprites.push(bathtubWater);
+            }
+          }
           return true;
         }
       },
@@ -228,5 +318,5 @@ function loadBathroom(tilesheet) {
         }
       }
     },
-  ].map(sprite => craftSprite(sprite));
+  ].map(sprite => craftSprite(sprite)).concat(leftWaterFlow, rightWaterFlow, bathtubWater);
 }
