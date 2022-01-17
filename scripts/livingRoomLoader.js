@@ -30,18 +30,21 @@ function loadLivingRoom(tilesheet) {
           gameState.navigateTo(Layers.MONICAS_ROOM);
           return true;
         }
-        if (isWithinRectBounds(x, y, 720, 0, 210, 317)) {
+        if (isWithinRectBounds(x, y, 720, 0, 210, 317)
+          || isWithinRectBounds(x, y, 722, 317, 142, 118)
+        ) {
           gameState.navigateTo(Layers.GUEST_ROOM);
           return true;
         }
         const item = gameState.selectedInventoryItem;
-        if (item && item.name === Names.OTTOMAN) {
+        if (item && item.name === Names.OTTOMAN
+          && isWithinRectBounds(x, y, 713, 485, 192, 148)
+        ) {
           item.state = item.FINAL;
           const tableIdx = gameState.layers[gameState.currentRoom].sprites.findIndex(sprite => sprite.name === Names.TABLE);
-          gameState.inventoryItems = gameState.inventoryItems.filter(sprite => sprite !== item);
+          removeOnce(gameState.inventoryItems, item);
           gameState.layers[gameState.currentRoom].sprites.splice(tableIdx, 0, item);
           gameState.layers[gameState.currentRoom].sprites.splice(tableIdx+1, 0, meatballClamp);
-          gameState.selectedInventoryItem = null;
           return true;
         }
       },
@@ -72,13 +75,14 @@ function loadLivingRoom(tilesheet) {
       ...base,
       onClick: function(x, y, gameState) {
         const item = gameState.selectedInventoryItem;
-        if (item && item.name === Names.COASTER) {
+        if (item && item.name === Names.COASTER
+          && this[this.state].isWithinBounds(x, y)
+        ) {
           item.state = item.FINAL;
           this.state = this.HOLDING;
           const tableIdx = gameState.layers[gameState.currentRoom].sprites.findIndex(sprite => sprite.name === Names.CUP);
-          gameState.inventoryItems = gameState.inventoryItems.filter(sprite => sprite !== gameState.selectedInventoryItem);
+          removeOnce(gameState.inventoryItems, item);
           gameState.layers[gameState.currentRoom].sprites.splice(tableIdx, 0, gameState.selectedInventoryItem);
-          gameState.selectedInventoryItem = null;
           return true;
         }
         if (this.state === this.HOLDING && isWithinRectBounds(x, y, 653, 452, 40, 15)) {
@@ -192,14 +196,7 @@ function loadLivingRoom(tilesheet) {
     },
     { // Baby 1
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.BABY_DOLL_WHITE,
@@ -252,12 +249,8 @@ function loadLivingRoom(tilesheet) {
           x: 870,
           y: 400,
           scale: 0.16,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
-          [Displays.EXAMINED]: {
-            scale: 1,
-          },
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 },
         }
       }
     },
@@ -273,9 +266,8 @@ function loadLivingRoom(tilesheet) {
           sourceWidth: 341,
           sourceHeight: 314,
           scale: 0.1,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 },
         }
       }
     },

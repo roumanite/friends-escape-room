@@ -639,13 +639,23 @@ function loadFreezer(tilesheet) {
       ...base, // Freezer background
       onClick: function(x, y, gameState) {
         const item = gameState.selectedInventoryItem;
-        if (item && item.name === Names.THE_SHINING
-          && isWithinRectBounds(x, y, 77, 60, 789, 269)) {
+        if (item && item.name === Names.THE_SHINING) {
+          let newY = 0, srcHeight = 0;
+          if (isWithinRectBounds(x, y, 77, 60, 789, 269)) {
+            newY = 60;
+            srcHeight = 382;
+          } else if (isWithinRectBounds(x, y, 77, 338, 787, 270)) {
+            newY = 340;
+            srcHeight = 390;
+          } else {
+            return false;
+          }
           item.state = item.FINAL;
+          item[item.state].y = newY;
+          item[item.state].sourceHeight = srcHeight;
           gameState.layers[gameState.currentRoom].sprites.push(item);
           gameState.layers[gameState.currentRoom].sprites.push(mincedBeef);
           removeOnce(gameState.inventoryItems, item);
-          
           return true;
         }
       },
@@ -660,6 +670,7 @@ function loadFreezer(tilesheet) {
     },
     {
       ...base, // Low fat ice cream
+      onClick: setSubtitle,
       states: {
         INITIAL: {
           description: "When you're getting screwed over all the time, you gotta switch to low fat.",
@@ -692,6 +703,7 @@ function loadBottomFridge(tilesheet) {
     },
     {
       ...base,
+      onClick: setSubtitle,
       states: {
         INITIAL: {
           description: 'Taste it.',

@@ -34,7 +34,7 @@ function loadMonicas(tilesheet) {
         INITIAL: {
           x: 0,
           y: 0,
-          sourceWidth: 956,
+          sourceWidth: 955,
           sourceHeight: 677,
         }
       }
@@ -156,9 +156,7 @@ function loadMonicasGreenDrawer1(tilesheet) {
           sourceHeight: 317,
           sourceX: 1000,
           sourceY: 695,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
+          [Displays.STORED]: { scale: 0.2 },
         }
       }
     },
@@ -222,9 +220,7 @@ function loadMonicasWhiteDrawer(tilesheet) {
           sourceHeight: 384,
           sourceX: 978,
           sourceY: 1020,
-          [Displays.STORED]: {
-            scale: 0.15,
-          },
+          [Displays.STORED]: { scale: 0.15 },
         },
         FINAL: {
           name: Names.GIANT_POKING_DEVICE,
@@ -236,7 +232,6 @@ function loadMonicasWhiteDrawer(tilesheet) {
           sourceX: 1000,
           sourceY: 1615,
           [Displays.STORED]: { scale: 0.11 },
-          [Displays.EXAMINED]: { scale: 1 },
         }
       }
     },
@@ -262,9 +257,7 @@ function loadBigBox(tilesheet) {
           rotation: 0,
           scale: 0.2,
         },
-        [Displays.EXAMINED]: {
-          rotation: 0,
-        }
+        [Displays.EXAMINED]: { rotation: 0 }
       }
     }
   });

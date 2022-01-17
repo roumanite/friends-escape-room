@@ -108,6 +108,13 @@ function pickUp(x, y, gameState, state = this.INITIAL) {
   return false;
 };
 
+function setSubtitle(x, y, gameState) {
+  if (this[this.state].isWithinBounds(x, y)) {
+    gameState.subtitle = this[this.state].description;
+    return true;
+  }
+}
+
 function combo(gameState, sprite1, sprite2Name) {
   if (gameState.examinedInventoryItem === sprite1 && gameState.selectedInventoryItem && gameState.selectedInventoryItem.name === sprite2Name) {
     return gameState.selectedInventoryItem;
