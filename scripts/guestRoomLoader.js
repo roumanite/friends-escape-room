@@ -45,9 +45,8 @@ function loadGuestRoom(tilesheet) {
           sourceWidth: 242,
           sourceHeight: 343,
           scale: 0.25,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           x: 200,
@@ -251,9 +250,8 @@ function loadGuestRoom(tilesheet) {
           sourceWidth: 219,
           sourceHeight: 184,
           scale: 0.7,
-          [Displays.STORED]: {
-            scale: 0.3,
-          },
+          [Displays.STORED]: { scale: 0.3 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           sourceX: 969,

@@ -48,7 +48,9 @@ craftSprite = (props) => {
     const extStateProps = { ...spriteObject[spriteObject.INITIAL], ...stateProps };
     // Displays.STORED and EXAMINED
     Object.entries(extStateProps).forEach(([k, v]) => {
-      if (typeof v === "object" && spriteObject[spriteObject.INITIAL].hasOwnProperty(k)) {
+      if (typeof v === "object" && spriteObject[spriteObject.INITIAL].hasOwnProperty(k)
+        && Object.keys(Displays).includes(k)
+      ) {
         extStateProps[k] = {
           ...spriteObject[spriteObject.INITIAL][k],
           x: extStateProps.x,

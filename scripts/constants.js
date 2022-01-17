@@ -57,6 +57,7 @@ const Names = {
   HANDYMAN_TOOL: 'Handyman Tool',
   SPICES: 'Spices',
   BREAD_ROLLS: 'Bread Rolls',
+  RACHEL_HAT: "Rachel's hat",
 
   // Living room items
   TABLE: 'Table',
@@ -86,6 +87,7 @@ const Names = {
   KEY: 'Apartment key',
   PHOEBE_GUITAR: "Phoebe's guitar",
   SAFE_BOX: "Safe box",
+  JELLYFISH_LOTION: 'Jellyfish Protective Lotion',
 };
 
 const base =

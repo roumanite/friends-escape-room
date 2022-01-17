@@ -1,32 +1,19 @@
 function loadKitchen(tilesheet) {
   const base = { img: tilesheet };
-  const fire = craftSprite(
-    {
-      ...base,
-      update: function(gameState) {
-        if (this[this.state].x > 565) {
-          this[this.state].goingRight = false;
-        }
-        if (this[this.state].x < 555) {
-          this[this.state].goingRight = true;
-        }
-        this[this.state].x = this[this.state].goingRight ? this[this.state].x + 1 : this[this.state].x - 1;
-        return true;
-      },
-      states: {
-        INITIAL: {
-          name: Names.FIRE,
-          x: 559,
-          y: 490,
-          sourceWidth: 202,
-          sourceHeight: 79,
-          sourceX: 2355,
-          sourceY: 300,
-          goingRight: true,
-        }
-      },
+  const hat = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        name: Names.RACHEL_HAT,
+        description: "They did experiments on me! I can't have children!",
+        sourceX: 3406,
+        sourceY: 725,
+        sourceWidth: 490,
+        sourceHeight: 258,
+        [Displays.STORED]: { scale: 0.18 },
+      }
     }
-  );
+  });
   return [
     { // Kitchen background
       ...base,
@@ -53,6 +40,12 @@ function loadKitchen(tilesheet) {
         }
         if (isWithinRectBounds(x, y, 0, 307, 165, 149)) {
           gameState.navigateTo(Layers.OVEN);
+          return true;
+        }
+        const item = gameState.selectedInventoryItem;
+        if (item && item.name === Names.GIANT_POKING_DEVICE
+          && isWithinRectBounds(x, y, 590, 303, 55, 248)) {
+          gameState.inventoryItems.push(hat);
           return true;
         }
       },
@@ -731,9 +724,8 @@ function loadBottomFridge(tilesheet) {
           sourceX: 1956,
           sourceY: 419,
           scale: 0.8,
-          [Displays.STORED]: {
-            scale: 0.25,
-          },
+          [Displays.STORED]: { scale: 0.25 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
       },
     },

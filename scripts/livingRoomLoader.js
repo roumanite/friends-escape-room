@@ -210,9 +210,8 @@ function loadLivingRoom(tilesheet) {
           sourceWidth: 333,
           sourceHeight: 364,
           scale: 0.1,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           x: 429,

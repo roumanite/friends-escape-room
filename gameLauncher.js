@@ -217,10 +217,30 @@ function launch() {
         gameState.examinedInventoryItem = null;
         return;
       }
-      if (gameState.selectedInventoryItem) {
-        if (!gameState.examinedInventoryItem.onClick(x, y, gameState)) {
-          gameState.selectedInventoryItem.onClick(x, y, gameState);
-        }
+      const sprite = gameState.examinedInventoryItem;
+
+      let topOffset = magnifier.margin + magnifier.padding;
+      const leftOffset = magnifier.margin + magnifier.padding;
+
+      if (sprite.name.trim().length > 0) {
+        const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
+        topOffset += magnifier.name.fontSize * lines.length + magnifier.name.marginBottom * 2;
+      }
+
+      if (sprite.description.trim().length > 0) {
+        const lines = getLines(ctx, sprite.description, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
+        topOffset += magnifier.desc.fontSize * lines.length + magnifier.desc.marginBottom;
+      }
+
+      const examinedSprite = gameState.examinedInventoryItem && gameState.examinedInventoryItem[gameState.examinedInventoryItem.state][Displays.EXAMINED];
+
+      const width = examinedSprite.scale * examinedSprite.sourceWidth;
+      const height = examinedSprite.scale * examinedSprite.sourceHeight;
+      const x2 = (canvas.width - width)/2;
+      const y2 = (canvas.height - inventory.slot.margin * 2 - inventory.slot.height + topOffset - height)/2;
+      
+      if (!gameState.examinedInventoryItem.onClick(x - x2, y - y2, gameState) && gameState.selectedInventoryItem) {
+        gameState.selectedInventoryItem.onClick(x, y, gameState);
         gameState.selectedInventoryItem = null;
       }
       return;
@@ -469,8 +489,10 @@ function launch() {
         examinedSprite.rotation, examinedSprite.scale,
       );
 
-      if (sprite[sprite.state].sprites) {  
-        sprite[sprite.state].sprites.forEach(extra => {
+      const sprites = examinedSprite.sprites === undefined ? sprite[sprite.state].sprites : examinedSprite.sprites;
+
+      if (sprites) {
+        sprites.forEach(extra => {
           const scale = extra[extra.state].scale * examinedSprite.scale;
           const examinedExtra = extra[extra.state][Displays.EXAMINED];
           renderSprite(
@@ -518,8 +540,9 @@ function launch() {
         storedSprite.rotation, storedSprite.scale,
       )
 
-      if (sprite[sprite.state].sprites) {  
-        sprite[sprite.state].sprites.forEach(extra => {
+      const sprites = storedSprite.sprites === undefined ? sprite[sprite.state].sprites : storedSprite.sprites;
+      if (sprites) {  
+        sprites.forEach(extra => {
           const scale = extra[extra.state].scale * storedSprite.scale;
           const storedExtra = extra[extra.state][Displays.STORED];
           renderSprite(

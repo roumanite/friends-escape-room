@@ -52,9 +52,8 @@ function loadMonicas(tilesheet) {
           sourceWidth: 424,
           sourceHeight: 397,
           scale: 0.1,
-          [Displays.STORED]: {
-            scale: 0.15,
-          },
+          [Displays.STORED]: { scale: 0.15 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           x: 630,
@@ -146,14 +145,7 @@ function loadMonicasGreenDrawer1(tilesheet) {
     },
     { // Rubber bands
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.RUBBER_BANDS,
@@ -209,17 +201,13 @@ function loadMonicasWhiteDrawer(tilesheet) {
     { // Chopsticks
       img: tilesheet,
       onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
+        if (pickUp.bind(this)(x, y, gameState)) {
           return true;
         }
-      },
-      onCombined: function(combi, gameState) {
-        if (combi.name === Names.RUBBER_BANDS) {
+        const rubberBands = combo(gameState, this, Names.RUBBER_BANDS);
+        if (rubberBands) {
           this.state = this.FINAL;
-          gameState.inventoryItems = gameState.inventoryItems.filter(sprite => sprite !== combi);
+          removeOnce(gameState.inventoryItems, rubberBands);
           gameState.examinedInventoryItem = this;
           return true;
         }
@@ -247,10 +235,8 @@ function loadMonicasWhiteDrawer(tilesheet) {
           sourceHeight: 411,
           sourceX: 1000,
           sourceY: 1615,
-          scale: 0.1,
-          [Displays.STORED]: {
-            scale: 0.1,
-          },
+          [Displays.STORED]: { scale: 0.11 },
+          [Displays.EXAMINED]: { scale: 1 },
         }
       }
     },

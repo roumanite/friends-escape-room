@@ -21,37 +21,50 @@ function loadBathroom(tilesheet) {
       }
     }
   );
-  const key = craftSprite(
-    {
-      ...base,
-      onClick: function(x, y, gameState) {
-        if (this[this.state].isWithinBounds(x, y)) {
-          gameState.inventoryItems.push(this);
-          removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
-          return true;
-        }
-      },
-      states: {
-        INITIAL: {
-          name: Names.KEY,
-          sourceX: 710,
-          sourceY: 1450,
-          sourceWidth: 48,
-          sourceHeight: 15,
-          x: 538,
-          y: 526,
-          rotation: 10,
-          [Displays.STORED]: {
-            sourceX: 11,
-            sourceY: 1436,
-            sourceWidth: 192,
-            sourceHeight: 419,
-            scale: 0.2,
-          }
-        }
+  const key = craftSprite({
+    ...base,
+    onClick: function(x, y, gameState) {
+      if (this[this.state].isWithinBounds(x, y)) {
+        gameState.inventoryItems.push(this);
+        removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
+        return true;
       }
     },
-  );
+    states: {
+      INITIAL: {
+        name: Names.KEY,
+        sourceX: 710,
+        sourceY: 1450,
+        sourceWidth: 48,
+        sourceHeight: 15,
+        x: 538,
+        y: 526,
+        rotation: 10,
+        [Displays.STORED]: {
+          sourceX: 11,
+          sourceY: 1436,
+          sourceWidth: 192,
+          sourceHeight: 419,
+          scale: 0.2,
+        }
+      }
+    }
+  });
+  const jellyfishLotion = craftSprite({
+    ...base,
+    states: {
+      INITIAL: {
+        name: Names.JELLYFISH_LOTION,
+        x: 380,
+        y: 100,
+        sourceWidth: 288,
+        sourceHeight: 497,
+        sourceX: 786,
+        sourceY: 1449,
+        [Displays.STORED]: { scale: 0.15 },
+      }
+    }
+  });
   return [
     {
       ...base,
@@ -121,6 +134,56 @@ function loadBathroom(tilesheet) {
         if (pickUp.bind(this)(x, y, gameState)) {
           return true;
         }
+        const examinedState = this[this.state][Displays.EXAMINED];
+        const scale = this[this.state][Displays.EXAMINED].scale;
+        if (this.state === this.INITIAL) {
+          const keyX = scale * 258;
+          const keyY = scale * 308;
+          const width = scale * 100;
+          const height = scale * 100;
+          for (let i = 0; i < 12; i++) {
+            if (isWithinRectBounds(x, y, keyX + (i % 4) * scale * 106, keyY + Math.floor(i / 4) * scale * 107, width, height)) {
+              if (i === 10) {
+                examinedState.sprites.pop();
+                return true;
+              } else if (i === 11) {
+                examinedState.sprites = [];
+                return true;
+              } else if (examinedState.sprites.length < 10) {
+                examinedState.sprites.push(craftSprite({
+                  ...base,
+                  states: {
+                    INITIAL: {
+                      name: i,
+                      x: 94 + examinedState.sprites.length * 80,
+                      y: 170,
+                      sourceX: 1286 + (i % 4) * 107,
+                      sourceY: 332 + Math.floor(i / 4) * 106,
+                      sourceWidth: 50,
+                      sourceHeight: 50,
+                    }
+                  }
+                }));
+                if (examinedState.sprites.map(sprite => sprite.name).join("") === "2043195118") {
+                  this.state = this.FINAL;
+                }
+                
+                return true;
+              }
+            }
+          }
+        } else {
+          if (isWithinRectBounds(
+            x, y,
+            scale * jellyfishLotion[jellyfishLotion.state].x, scale * jellyfishLotion[jellyfishLotion.state].y,
+            scale * jellyfishLotion[jellyfishLotion.state].sourceWidth, scale * jellyfishLotion[jellyfishLotion.state].sourceHeight,
+          )) {
+            gameState.inventoryItems.push(jellyfishLotion);
+            removeOnce(examinedState.sprites, jellyfishLotion);
+            gameState.examinedInventoryItem = jellyfishLotion;
+            return true;
+          }
+        }
       },
       states: {
         INITIAL: {
@@ -140,8 +203,28 @@ function loadBathroom(tilesheet) {
             sourceX: 1000,
             sourceY: 0,
             scale: 0.7,
+            sprites: [],
           },
         },
+        FINAL: {
+          sourceX: 1000,
+          sourceY: 751,
+          sourceWidth: 955,
+          sourceHeight: 677,
+          [Displays.STORED]: {
+            sourceWidth: 104,
+            sourceHeight: 106,
+            sourceX: 582,
+            sourceY: 1439,
+            x: 236,
+            y: 283,
+            scale: 0.8,
+          },
+          [Displays.EXAMINED]: {
+            scale: 0.7,
+            sprites: [jellyfishLotion],
+          },
+        }
       }
     },
   ].map(sprite => craftSprite(sprite));
