@@ -55,7 +55,11 @@ section, nav {
   align-self: flex-end;
 }
 
-.resources {
+.game-controls-header {
+  margin-top: 0rem;
+}
+
+.resources, .game-controls {
   background-color: rgba(232, 199, 240, 1);
   padding: 2rem;
   border-radius: 30px;
@@ -88,7 +92,7 @@ canvas {
   margin-right: auto;
 }
 
-header {
+.walkthrough-header, .escape-room-header {
   display: flex;
   align-items: center;
   justify-content: center;

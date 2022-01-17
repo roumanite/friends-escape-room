@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  <header>
+  <header class="walkthrough-header">
     <h1>Walkthrough</h1>
     <nav>
       <a class="button-link" href="index.html">
@@ -21,7 +21,7 @@
     <ol class="wt-steps" id="monica-wt-steps">
       <li>Go to the bathroom and pick up the purple box placed inside the bathtub.</li>
       <li>Go to the living room and lift the yellow pillow. Pick up the yellow notepad.</li>
-      <li>Click the laptop. The yellow notepad hints that the laptop password is a translation of "Joey Tribbiani". Type in "Baby Kangaroo Tribbiani".</li>
+      <li>Click the laptop. The yellow notepad hints that the laptop password is a translation of "Thy turkey's done". Type in "BING".</li>
       <li>
         A hint for the purple box's code will be displayed. The code is:
         <ol>
@@ -69,20 +69,20 @@
     <button class="wt-reveal" id="ross-wt">
       Ross' beach item
     </button>
-    <ol class="wt-steps" id="ross-wt-steps">
-      <li>Pick up Chandler Figurine in the living room, under the TV.</li>
-      <li>Place the Chandler Figurine in the big box in Monica's bedroom.</li>
-      <li>Pick up the Midori that appears after the figurine is placed.</li>
-    </ol>
+    <article class="wt-steps" id="ross-wt-steps">
+      Pick up Midori in the 2nd blue drawer in the kitchen.
+    </article>
   </section>
 
   <section>
     <button class="wt-reveal" id="chandler-wt">
       Chandler's beach item
     </button>
-    <article class="wt-steps" id="chandler-wt-steps">
-      Pick up Chandler's glasses on the clothes hanger near the apartment door.
-    </article>
+    <ol class="wt-steps" id="chandler-wt-steps">
+      <li>Pick up Chandler's figurine in the living room under the TV.</li>
+      <li>Put the figurine in the big box in Monica's bedroom.</li>
+      <li>Pick up Chandler's glasses that appear after the figurine is placed.</li>
+    </ol>
   </section>
   
   <section>
@@ -91,7 +91,8 @@
     </button>
     <ol class="wt-steps" id="joey-wt-steps">
       <li>Go to Monica's bedroom and collect the coaster from behind the pillows.</li>
-      <li>In the guest room:
+      <li>
+        In the guest room:
         <ol type="a">
           <li>Pick up the onion inside the 1st shelf of the white dresser.</li>
           <li>Pick up the cooking oil inside the 2nd shelf of the white dresser.</li>
@@ -100,27 +101,66 @@
           <li>Collect the green ottoman.</li>
         </ol>
       </li>
-      <li>In the living room:
+      <li>
+        In the living room:
         <ol type="a">
           <li>Collect marinara sauce from behind the pink pillow.</li>
           <li>Place the coaster under the cup on the table. Pick up the egg that appears after the coaster is placed.</li>
           <li>Place the ottoman infront of the sofa with pink pillow. Pick up the meatball clamp that appears.</li>
         </ol>
       </li>
-      <li>In the kitchen:
+      <li>
+        In the kitchen:
         <ol type="a">
           <li>Collect bread rolls from the blue rack.</li>
+          <li>Collect spices from kitchen counter.</li>
           <li>Click the upper part of the fridge which is the freezer. Place The Shining and a plate of minced beef will appear. Pick up the minced beef.</li>
           <li>Exit the freezer and enter the bottom half of the fridge. Collect a plate of Mozarella cheese inside.</li>
           <li>Collect the frying pan from the hanging rack in the kitchen.</li>
         </ol>
       </li>
+      <li>Combine minced beef with spices, egg, breadcrumbs, and chopped onions.</li>
+      <li>Shape the mixture using meatball clamp.</li>
+      <li>
+        On the stove in the kitchen:
+        <ol type="a">
+          <li>Put the frying pan on the stove.</li>
+          <li>Pour the cooking oil onto the frying pan.</li>
+          <li>Turn on the stove and fire will appear.</li>
+          <li>Put the raw meatball dough on the oil.</li>
+          <li>Wait a few seconds until the meatballs are fried and the fire disappears by itself.</li>
+          <li>Pick up the fried meatballs.</li>
+        </ol>
+      </li>
+      <li>Combine the fried meatballs with the bread rolls.</li>
+      <li>Combine the fried meatballs on bread rolls with marinara sauce.</li>
+      <li>Combine the fried meatballs on bread rolls with marinara sauce with mozarella cheese.</li>
+      <li>
+        On the oven in the kitchen:
+        <ol type="a">
+          <li>Put the bread rolls on the oven and close the oven door.</li>
+          <li>Turn on the oven by clicking the upper part of the oven. The door's color will turn red.</li>
+          <li>Wait a few seconds until the door is opened. Pick up the ready-to-eat baked meatball sub.</li>
+        </ol>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <button class="wt-reveal" id="key-wt">
+      Apartment key
+    </button>
+    <ol class="wt-steps" id="key-wt-steps">
+      <li>Pick up the handyman tool in the kitchen's blue rack.</li>
+      <li>Go to the bathroom and use the handyman tool on the tile of the 3rd row and 3rd column from rightmost.</li>
+      <li>The tile will be pried open and a key will be revealed. Pick up the key.</li>
+      <li>Once all the beach items are collected, you will be able to use the key to escape Monica's apartment.</li>
     </ol>
   </section>
 </body>
 
 <script>
-  ["monica", "rachel", "phoebe", "ross", "chandler", "joey"].forEach(name => {
+  ["monica", "rachel", "phoebe", "ross", "chandler", "joey", "key"].forEach(name => {
     document.getElementById(`${name}-wt`).onclick = function() {
       toggleDisplay(`${name}-wt-steps`);
     };
