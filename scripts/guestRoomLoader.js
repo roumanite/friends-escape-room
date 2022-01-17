@@ -50,7 +50,7 @@ function loadGuestRoom(tilesheet) {
         },
         FINAL: {
           x: 200,
-          y: 70,
+          y: 80,
           sourceX: 1812,
           sourceY: 1027,
           sourceWidth: 136,

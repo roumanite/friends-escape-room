@@ -183,10 +183,11 @@ const subtitleBox = {
     width: 30,
     height: 30,
   },
+  marginTop: 15,
   lineHeight: 10,
   padding: 10,
   fontSize: 25,
   calcHeight: function(lines) {
-    return this.padding * 2 + (this.fontSize + this.lineHeight) * lines.length;
+    return this.padding * 2 + (this.fontSize + this.lineHeight + this.marginTop) * lines.length;
   },
 }

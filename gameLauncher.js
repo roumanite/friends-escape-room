@@ -198,6 +198,7 @@ function launch() {
         const x2 = inventory.boxX(canvas.width, numberOfItems, i, gameState.page);
         if (isWithinRectBounds(x, y, x2, 687, 80, 80)) {
           if (gameState.selectedInventoryItem === sprite) {
+            gameState.subtitle = '';
             gameState.examinedInventoryItem = sprite;
             gameState.selectedInventoryItem = null;
           } else if (gameState.examinedInventoryItem === sprite) {
@@ -220,14 +221,15 @@ function launch() {
       const sprite = gameState.examinedInventoryItem;
 
       let topOffset = magnifier.margin + magnifier.padding;
-      const leftOffset = magnifier.margin + magnifier.padding;
 
       if (sprite.name.trim().length > 0) {
+        ctx.font = `bold ${magnifier.name.fontSize}px Arial`;
         const lines = getLines(ctx, sprite.name, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
         topOffset += magnifier.name.fontSize * lines.length + magnifier.name.marginBottom * 2;
       }
 
       if (sprite.description.trim().length > 0) {
+        ctx.font = `${magnifier.desc.fontSize}px Arial`;
         const lines = getLines(ctx, sprite.description, canvas.width - magnifier.margin * 2 - magnifier.padding * 2 - magnifier.exit.width - magnifier.exit.margin);
         topOffset += magnifier.desc.fontSize * lines.length + magnifier.desc.marginBottom;
       }
@@ -247,6 +249,7 @@ function launch() {
     }
 
     if (gameState.subtitle.trim().length > 0) {
+      ctx.font = `bold ${subtitleBox.fontSize}px Arial`;
       const lines = getLines(ctx, gameState.subtitle, canvas.width - subtitleBox.padding * 2);
       const height = subtitleBox.calcHeight(lines);
       const topOffset = canvas.height - inventory.slot.margin * 2 - inventory.slot.height - height;
@@ -314,23 +317,25 @@ function launch() {
 
   function renderSubtitle() {
     if (gameState.subtitle.trim().length > 0) {
-      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
+      console.log(canvas.width - subtitleBox.padding * 2);
+      
+      ctx.font = `bold ${subtitleBox.fontSize}px Arial`;
       const lines = getLines(ctx, gameState.subtitle, canvas.width - subtitleBox.padding * 2);
       const height = subtitleBox.calcHeight(lines);
       const topOffset = canvas.height - inventory.slot.margin * 2 - inventory.slot.height - height;
 
+      ctx.fillStyle = transparentize(Colors.DARK_PURPLE, 0.2);
       ctx.fillRect(
         0, topOffset,
         canvas.width, height,
       );
 
       ctx.fillStyle = Colors.WHITE;
-      ctx.font = `bold ${subtitleBox.fontSize}px Arial`;
-      lines.forEach(line => {
+      lines.forEach((line, i) => {
         ctx.fillText(
           line,
           subtitleBox.padding,
-          topOffset + subtitleBox.lineHeight,
+          topOffset + subtitleBox.marginTop + (subtitleBox.lineHeight + subtitleBox.fontSize) * i,
         );
       });
 

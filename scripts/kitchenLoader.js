@@ -48,6 +48,7 @@ function loadKitchen(tilesheet) {
           && gameState.inventoryItems.every(item => item.name !== Names.RACHEL_HAT)
         ) {
           gameState.inventoryItems.push(hat);
+          gameState.examinedInventoryItem = hat;
           return true;
         }
       },

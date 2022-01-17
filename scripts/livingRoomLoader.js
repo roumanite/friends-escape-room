@@ -76,7 +76,7 @@ function loadLivingRoom(tilesheet) {
       onClick: function(x, y, gameState) {
         const item = gameState.selectedInventoryItem;
         if (item && item.name === Names.COASTER
-          && this[this.state].isWithinBounds(x, y)
+          && isWithinRectBounds(x, y, 630, 460, 80, 46)
         ) {
           item.state = item.FINAL;
           this.state = this.HOLDING;
