@@ -47,12 +47,8 @@ function loadEntrance(tilesheet) {
           sourceY: 0,
           sourceWidth: 352,
           sourceHeight: 430,
-          [Displays.STORED]: {
-            scale: 0.2,
-          },
-          [Displays.EXAMINED]: {
-            scale: 1,
-          }
+          [Displays.STORED]: { scale: 0.2 },
+          [Displays.EXAMINED]: { scale: 1 }
         },
         FINAL: {
           x: 520,

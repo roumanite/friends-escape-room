@@ -14,22 +14,14 @@ function loadBathroom(tilesheet) {
           sourceHeight: 306,
           sourceX: 236,
           sourceY: 1453,
-          [Displays.STORED]: {
-            scale: 0.3,
-          }
+          [Displays.STORED]: { scale: 0.3 },
         }
       }
     }
   );
   const key = craftSprite({
     ...base,
-    onClick: function(x, y, gameState) {
-      if (this[this.state].isWithinBounds(x, y)) {
-        gameState.inventoryItems.push(this);
-        removeOnce(gameState.layers[gameState.currentRoom].sprites, this);
-        return true;
-      }
-    },
+    onClick: pickUp,
     states: {
       INITIAL: {
         name: Names.KEY,
@@ -46,7 +38,16 @@ function loadBathroom(tilesheet) {
           sourceWidth: 192,
           sourceHeight: 419,
           scale: 0.2,
-        }
+          rotation: 1,
+        },
+        [Displays.EXAMINED]: {
+          rotation: 1,
+          sourceX: 11,
+          sourceY: 1436,
+          sourceWidth: 192,
+          sourceHeight: 419,
+          scale: 1,
+        },
       }
     }
   });

@@ -44,7 +44,9 @@ function loadKitchen(tilesheet) {
         }
         const item = gameState.selectedInventoryItem;
         if (item && item.name === Names.GIANT_POKING_DEVICE
-          && isWithinRectBounds(x, y, 590, 303, 55, 248)) {
+          && isWithinRectBounds(x, y, 590, 303, 55, 248)
+          && gameState.inventoryItems.every(item => item.name !== Names.RACHEL_HAT)
+        ) {
           gameState.inventoryItems.push(hat);
           return true;
         }
@@ -183,7 +185,7 @@ function loadKitchen(tilesheet) {
         }
       },
     }
-  ].map(props => craftSprite(props))//.concat(fire);
+  ].map(props => craftSprite(props));
 }
 
 function loadStove(tilesheet) {
@@ -321,7 +323,8 @@ function loadOven(tilesheet) {
         }
 
         const item = gameState.selectedInventoryItem;
-        if (isWithinRectBounds(x, y, 100, 118, 744, 417)
+        if (door.state === door.INITIAL
+          && isWithinRectBounds(x, y, 100, 118, 744, 417)
           && item && item.name === Names.MEATBALLS_ON_BREAD_WITH_MARINARA_CHEESE
         ) {
           removeOnce(gameState.inventoryItems, item);
@@ -386,9 +389,7 @@ function loadBlueDrawer2(tilesheet) {
           sourceY: 1555,
           sourceWidth: 125,
           sourceHeight: 481,
-          [Displays.STORED]: {
-            scale: 0.15,
-          },
+          [Displays.STORED]: { scale: 0.15 },
         }
       }
     }
@@ -413,12 +414,8 @@ function loadFreezer(tilesheet) {
         sourceHeight: 105,
         sourceX: 3030,
         sourceY: 1889,
-        [Displays.STORED]: {
-          sourceHeight: 138,
-        },
-        [Displays.EXAMINED]: {
-          sourceHeight: 138,
-        },
+        [Displays.STORED]: { sourceHeight: 138 },
+        [Displays.EXAMINED]: { sourceHeight: 138 },
       },
     }
   });
@@ -432,11 +429,11 @@ function loadFreezer(tilesheet) {
           }
 
           const sprites = Array(mixture.length).fill(null).concat(frontPlate);
-          let shouldRender = false;
+          let mixtureAdded = false;
           mixture.forEach((ingredientName, i) => {
             const ingredient = combo(gameState, this, ingredientName);
             if (ingredient) {
-              shouldRender = true;
+              mixtureAdded = true;
               ingredient.state = ingredient.FINAL;
               removeOnce(gameState.inventoryItems, ingredient);
               if (this[this.state].sprites.length > 0) {
@@ -452,7 +449,7 @@ function loadFreezer(tilesheet) {
               }
             }
           });
-          if (shouldRender) {
+          if (mixtureAdded) {
             this[this.state].sprites = sprites.filter(sprite => sprite);
             return true;
           }
@@ -467,7 +464,6 @@ function loadFreezer(tilesheet) {
           break;
         case this.FRIED:
           if (pickUp.bind(this)(x, y, gameState, this.state)) {
-            gameState.layers[Layers.STOVE].sprites = gameState.layers[Layers.STOVE].sprites.filter(sprite => sprite.name !== Names.FIRE);
             return true;
           }
           const ingredient = combo(gameState, this, Names.BREAD_ROLLS);
@@ -533,9 +529,7 @@ function loadFreezer(tilesheet) {
           scale: 0.15,
           sourceHeight: 220,
         },
-        [Displays.EXAMINED]: {
-          sourceHeight: 220,
-        },
+        [Displays.EXAMINED]: { sourceHeight: 220 },
       },
       RAW: {
         name: Names.RAW_MEATBALLS,

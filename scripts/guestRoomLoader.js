@@ -285,14 +285,7 @@ function loadGuestWhiteDrawer1(tilesheet) {
     },
     {
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.CHOPPED_ONIONS,
@@ -303,9 +296,8 @@ function loadGuestWhiteDrawer1(tilesheet) {
           sourceX: 963,
           sourceY: 764,
           scale: 0.7,
-          [Displays.STORED]: {
-            scale: 0.15,
-          },
+          [Displays.STORED]: { scale: 0.15 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           sourceWidth: 266,
@@ -338,14 +330,7 @@ function loadGuestWhiteDrawer2(tilesheet) {
     },
     {
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.COOKING_OIL,
@@ -402,14 +387,7 @@ function loadGuestWhiteDrawer3(tilesheet) {
     },
     {
       ...base,
-      onClick: function(x, y, gameState) {
-        if (this.state === this.INITIAL && this[this.state].isWithinBounds(x, y)) {
-          gameState.layers[gameState.currentRoom].sprites = gameState.layers[gameState.currentRoom].sprites.filter(sprite => sprite !== this);
-          
-          gameState.inventoryItems.push(this);
-          return true;
-        }
-      },
+      onClick: pickUp,
       states: {
         INITIAL: {
           name: Names.BABY_DOLL_BLACK,
@@ -420,9 +398,8 @@ function loadGuestWhiteDrawer3(tilesheet) {
           sourceHeight: 441,
           sourceX: 1736,
           sourceY: 545,
-          [Displays.STORED]: {
-            scale: 0.19,
-          },
+          [Displays.STORED]: { scale: 0.19 },
+          [Displays.EXAMINED]: { scale: 1 },
         },
         FINAL: {
           x: 520,

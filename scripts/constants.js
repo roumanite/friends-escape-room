@@ -90,7 +90,7 @@ const Names = {
   JELLYFISH_LOTION: 'Jellyfish Protective Lotion',
 };
 
-const base =
+const spriteBase =
 {
   img: null,
   INITIAL: 0,
@@ -101,9 +101,9 @@ const base =
     return false;
   },
 };
-base.state = base.INITIAL;
+spriteBase.state = spriteBase.INITIAL;
 const spriteObject = {
-  ...base,
+  ...spriteBase,
   get name() {
     return this[this.state].name || this[this.INITIAL].name;
   },
