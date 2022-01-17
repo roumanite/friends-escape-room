@@ -1,7 +1,7 @@
 launch();
 
 function launch() {
-  const tilesheetsNum = 3;
+  const tilesheetsNum = 6;
   let assetsLoaded = 0;
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -183,11 +183,15 @@ function launch() {
     const y = e.pageY - canvas.offsetTop - canvas.clientTop;
     const sprites = gameState.layers[gameState.currentRoom].sprites;
     if (isWithinRectBounds(x, y, 0, 677, 955, 100)) {
-      if (isWithinRectBounds(x, y, inventory.prevArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
+      if (isWithinRectBounds(x, y, inventory.prevArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)
+       && gameState.page > 1
+      ) {
         gameState.page -= 1;
         return;
       }
-      if (isWithinRectBounds(x, y, inventory.nextArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)) {
+      if (gameState.inventoryItems.length > inventory.perPage * gameState.page
+        && isWithinRectBounds(x, y, inventory.nextArrowX, inventory.arrowY, inventory.arrow.width, inventory.arrow.height)
+      ) {
         gameState.page += 1;
         return;
       }
