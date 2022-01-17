@@ -18,6 +18,7 @@ function launch() {
     gameOver: false,
     withAnimation: false,
     navigateTo: function(layer) {
+      this.subtitle = '';
       this.currentRoom = layer;
       this.withAnimation = false;
     }
