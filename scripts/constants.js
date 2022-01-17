@@ -39,8 +39,8 @@ const Layers = {
 
 const Names = {
   // Entrance
-  CHANDLER_GLASSES: "Chandler's glasses",
-  BABY_DOLL_BROWN: 'Baby doll wearing brown',
+  CHANDLER_GLASSES: "Chandler's Glasses",
+  BABY_DOLL_BROWN: 'Baby Doll Wearing Brown',
 
   // Kitchen
   MINCED_BEEF: 'Minced Beef',
@@ -57,23 +57,23 @@ const Names = {
   HANDYMAN_TOOL: 'Handyman Tool',
   SPICES: 'Spices',
   BREAD_ROLLS: 'Bread Rolls',
-  RACHEL_HAT: "Rachel's hat",
+  RACHEL_HAT: "Rachel's Hat",
 
   // Living room items
   TABLE: 'Table',
   CUP: 'Cup',
   EGG: 'Egg',
-  BABY_DOLL_WHITE: 'Baby doll wearing white',
+  BABY_DOLL_WHITE: 'Baby Doll Wearing White',
   MEATBALL_CLAMP: 'Meatball Clamp',
   MARINARA_SAUCE: 'Marinara Sauce',
   CHANDLER_FIGURINE: 'Chandler Bing Figurine',
 
   // Monica's room items
-  RUBBER_BANDS: 'Rubber bands',
+  RUBBER_BANDS: 'Rubber Bands',
   MIDORI: 'Midori',
   CHOPSTICKS: 'Chopsticks',
   COASTER: 'Coaster',
-  GIANT_POKING_DEVICE: 'Giant poking device',
+  GIANT_POKING_DEVICE: 'Giant Poking Device',
 
   // Guest room items
   THE_SHINING: 'The Shining',
@@ -81,12 +81,12 @@ const Names = {
   OTTOMAN: 'The Green Ottoman',
   CHOPPED_ONIONS: 'Chopped Onions',
   COOKING_OIL: 'Cooking Oil',
-  BABY_DOLL_BLACK: 'Baby doll wearing black',
+  BABY_DOLL_BLACK: 'Baby Doll Wearing Black',
 
   // Bathroom
-  KEY: 'Apartment key',
-  PHOEBE_GUITAR: "Phoebe's guitar",
-  SAFE_BOX: "Safe box",
+  KEY: 'Apartment Key',
+  PHOEBE_GUITAR: "Phoebe's Guitar",
+  SAFE_BOX: "Safe Box",
   JELLYFISH_LOTION: 'Jellyfish Protective Lotion',
 };
 
