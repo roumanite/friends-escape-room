@@ -20,6 +20,12 @@ button, select {
   justify-content: center;
 }
 
+@media (max-device-width: 1155px), (max-width: 1155px) {
+  .game-container {
+    flex-direction: column;
+  }
+}
+
 h1 {
   color: rgba(92, 50, 168);
 }
