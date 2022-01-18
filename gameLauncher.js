@@ -246,10 +246,17 @@ function launch() {
       const x2 = (canvas.width - width)/2;
       const y2 = (canvas.height - inventory.slot.margin * 2 - inventory.slot.height + topOffset - height)/2;
       
-      if (!gameState.examinedInventoryItem.onClick(x - x2, y - y2, gameState) && gameState.selectedInventoryItem) {
-        gameState.selectedInventoryItem.onClick(x, y, gameState);
+      
+      if (gameState.examinedInventoryItem.onClick(x - x2, y - y2, gameState)) {
         gameState.selectedInventoryItem = null;
+        return;
       }
+
+      if (gameState.selectedInventoryItem) {
+        gameState.selectedInventoryItem.onClick(x, y, gameState);
+      }
+      
+      gameState.selectedInventoryItem = null;
       return;
     }
 
