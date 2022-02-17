@@ -12,4 +12,6 @@ warm,kettle,blender,toaster,rice cooker,spatula,grater,tongs,peeler,chopping boa
 dishwasher,grater,frying pan,food processor,wok,baking tray,steam,mash,pinch,pepper
 paprika,herbs,basil,parsley,butter,cheese,diced,sprinkle,ingredient,allergy,serve
 roast,baker,flour,milk,grease,batter,green onion,broccoli,mixer,cake,burn,cookbook
-recipe,tablespoon,teaspoon,whisk
+recipe,tablespoon,teaspoon,whisk,beverage,brunch,chair,cashier,condiments,delicious
+tasty,egg,fruit,gourmet,lettuce,mug,milk,noodles,party,sugar,spices,soda,sandwich,supper
+well done,mustard,tax,manager
