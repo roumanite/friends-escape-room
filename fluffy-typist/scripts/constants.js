@@ -1,5 +1,6 @@
 const NON_TEXT = 'NON-TEXT';
 const TEXT = 'TEXT';
+const SHAPE = 'SHAPE';
 
 const spriteBase =
 {
@@ -23,4 +24,18 @@ const textBase = {
   type: TEXT,
   font: '',
   baseline: 'top',
+}
+
+const rectBase = {
+  type: SHAPE,
+  width: 100,
+  height: 100,
+  x: 0,
+  y: 0,
+}
+
+const stateBase = {
+  sprites: [],
+  update: () => {},
+  listeners: {},
 }
