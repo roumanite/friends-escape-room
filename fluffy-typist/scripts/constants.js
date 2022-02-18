@@ -1,6 +1,7 @@
 const NON_TEXT = 'NON-TEXT';
 const TEXT = 'TEXT';
 const SHAPE = 'SHAPE';
+const STROKE = 'STROKE';
 
 const spriteBase = {
   type: NON_TEXT,
@@ -30,6 +31,8 @@ const textBase = {
   type: TEXT,
   font: '',
   baseline: 'top',
+  shadowColor: 'black',
+  shadowBlur: 0,
 }
 
 const rectBase = {

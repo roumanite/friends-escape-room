@@ -19,6 +19,7 @@ function getIntroInfo(gameInfo, tilesheet) {
       baseline: 'top',
       color: '#7393BC',
       text: 'Fluffy Typist',
+      shadowBlur: 10,
       x: 80,
       y: 80,
     }, {
@@ -33,6 +34,24 @@ function getIntroInfo(gameInfo, tilesheet) {
       color: '#002C67',
       text: 'Fluffy Typist',
       x: 90, y: 90,
+    }, {
+      ...textBase,
+      font: 'normal bold 24px nokia',
+      color: '#00C1F3',
+      text: 'Help Fluffy write his restaurant menu!',
+      shadowBlur: 20,
+      shadowColor: '#002C67',
+      width: 10,
+      x: 80, y: 230,
+    }, {
+      ...textBase,
+      font: 'normal bold 30px nokia',
+      color: '#00C1F3',
+      text: 'Press ENTER to start',
+      x: 80, y: 290,
+      shadowBlur: 20,
+      width: 10,
+      shadowColor: '#002C67',
     }],
     listeners: {
       'keydown': function(e) {
