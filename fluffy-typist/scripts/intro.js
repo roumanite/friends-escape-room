@@ -2,9 +2,9 @@ function getIntroInfo(gameInfo, tilesheet) {
   return {
     ...stateBase,
     sprites: [{
-      ...spriteBase,
+      ...artBase,
       img: tilesheet,
-      [spriteBase.INITIAL]: {
+      [artBase.INITIAL]: {
         x: 0,
         y: 0,
         sourceX: 0,

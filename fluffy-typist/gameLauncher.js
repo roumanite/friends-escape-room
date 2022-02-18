@@ -5,12 +5,14 @@ function launch() {
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  selectionGenerator.words = words;
 
   let assetsLoaded = 0;
   const totalAssetCount = 2;
   let sprites = [];
   let currentState = 0;
   const gameInfo = {
+    input: '',
     incrementLevel: () => {
       Object.entries(gameStates[currentState].listeners || {}).forEach(([e, callback]) => {
         window.removeEventListener(e, callback);
@@ -31,7 +33,7 @@ function launch() {
       }
     }
   }];
-  
+
   gameStates[2] = getLevel1Info(gameInfo);
 
   new FontFace('nokia', 'url(assets/nokiafc22.ttf)').load().then(function(font) {
@@ -56,23 +58,25 @@ function launch() {
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     sprites.forEach(sprite => {
-      if (sprite.type === TEXT) {
-        ctx.font = sprite.font;
-        ctx.fillStyle = sprite.color;
-        ctx.textBaseline = sprite.baseline;
-        ctx.fillText(sprite.text, sprite.x, sprite.y);
-      } else if (sprite.type === NON_TEXT) {
-        const sp = sprite[sprite.state];
-        ctx.drawImage(
-          sprite.img,
-          sp.sourceX, sp.sourceY,
-          sp.sourceWidth, sp.sourceHeight,
-          sp.x, sp.y,
-          sp.sourceWidth * sp.scale, sp.sourceHeight * sp.scale,
-        )
-      } else {
-        ctx.fillStyle = sprite.color;
-        ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+      if (sprite.visible) {
+        if (sprite.type === TEXT) {
+          ctx.font = sprite.font;
+          ctx.fillStyle = sprite.color;
+          ctx.textBaseline = sprite.baseline;
+          ctx.fillText(sprite.text, sprite.x, sprite.y);
+        } else if (sprite.type === NON_TEXT) {
+          const sp = sprite[sprite.state];
+          ctx.drawImage(
+            sprite.img,
+            sp.sourceX, sp.sourceY,
+            sp.sourceWidth, sp.sourceHeight,
+            sp.x, sp.y,
+            sp.sourceWidth * sp.scale, sp.sourceHeight * sp.scale,
+          )
+        } else {
+          ctx.fillStyle = sprite.color;
+          ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+        }
       }
     });
   }
