@@ -1,4 +1,5 @@
 function getLevel1Info(gameInfo, tilesheet) {
+  const ctx = gameInfo.canvas.getContext("2d");
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
@@ -74,6 +75,19 @@ function getLevel1Info(gameInfo, tilesheet) {
     color: transparentize(Colors.DARK_ORANGE, 0.7),
     x: 10,
   };
+  const underscore = {
+    ...textBase,
+    text: '_',
+    font: 'normal bold 30px nokia',
+    color: Colors.BLACK,
+  };
+  const inputText = {
+    ...textBase,
+    text: gameInfo.input,
+    font: 'normal bold 30px nokia',
+    color: Colors.BLACK,
+    x: 27,
+  }
   const wordBackgrounds = [
     {
       ...artBase,
@@ -90,7 +104,7 @@ function getLevel1Info(gameInfo, tilesheet) {
   const sprites = [{
     ...rectBase,
     color: Colors.LEMON,
-  }, fluffy, typewriter, inputStart, inputContent];
+  }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
   const speeds = [2, 3, 5];
   let speedIndex = 0;
   const limit = [5, 10, 15];
@@ -120,7 +134,14 @@ function getLevel1Info(gameInfo, tilesheet) {
       inputContent.y = gameInfo.canvas.height - 51;
       inputContent.width = gameInfo.canvas.width - 10 * 2;
       typewriter[typewriter.state].x = gameInfo.canvas.width / 2 - typewriter[typewriter.state].sourceWidth * typewriter[typewriter.state].scale / 2;
-      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight *typewriter[typewriter.state].scale;
+      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight * typewriter[typewriter.state].scale;
+      ctx.font = inputText.font;
+      ctx.baseline = 'top';
+      let width = ctx.measureText(gameInfo.input).width;
+      underscore.x = inputText.x + width;
+      underscore.y = inputContent.y + 12;
+      inputText.text = gameInfo.input;
+      inputText.y = underscore.y;
       let spawnedCount = 0;
       let missedCount = 0;
       sprites.forEach(sprite => {
@@ -129,7 +150,6 @@ function getLevel1Info(gameInfo, tilesheet) {
           sprite.y += sprite.vy;
         }
         if (sprite.timer !== undefined && sprite.timer <= 0) {
-          const ctx = gameInfo.canvas.getContext("2d");
           sprite.visible = true;
           sprite.timer = undefined;
           ctx.font = sprite.font;
@@ -163,9 +183,15 @@ function getLevel1Info(gameInfo, tilesheet) {
     },
     listeners: {
       'keydown': e => {
-        if (e.key >= "a" && e.key <= "z") {
+        ctx.font = inputText.font;
+        ctx.baseline = 'top';
+        let width = ctx.measureText(gameInfo.input).width;
+        if (e.key >= "a" && e.key <= "z" && width < inputContent.width - 100) {
           gameInfo.input += e.key;
           fluffy.state = fluffy.BOW;
+        }
+        if (e.key === "Backspace") {
+          gameInfo.input = gameInfo.input.slice(0, -1);
         }
         if (e.key === "Enter") {
           sprites.forEach(sprite => {

@@ -8,4 +8,5 @@ const Colors = {
   DARK_BLUE: 'rgba(0, 44, 103, 1)',
   GENERIC_GRAY: 'rgba(115, 147, 188, 1)',
   DARK_ORANGE: 'rgba(146, 113, 70, 1)',
+  BLACK: 'rgba(0, 0, 0, 1)',
 };

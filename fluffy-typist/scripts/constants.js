@@ -39,6 +39,8 @@ const textBase = {
   baseline: 'top',
   shadowColor: 'black',
   shadowBlur: 0,
+  x: 0,
+  y: 0,
 }
 
 const rectBase = {
