@@ -7,4 +7,5 @@ const Colors = {
   LIGHT_BLUE: 'rgba(0, 193, 243, 1)',
   DARK_BLUE: 'rgba(0, 44, 103, 1)',
   GENERIC_GRAY: 'rgba(115, 147, 188, 1)',
+  DARK_ORANGE: 'rgba(146, 113, 70, 1)',
 };

@@ -52,6 +52,7 @@ const rectBase = {
 
 const stateBase = {
   sprites: [],
+  appendSprites: false,
   update: () => {},
   listeners: {},
 }

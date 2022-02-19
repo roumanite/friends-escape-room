@@ -1,9 +1,3 @@
-const transparentize =  (color, opacity) => {
-  const lastIndex = color.lastIndexOf('1');
-
-  return color.slice(0, lastIndex) + opacity + color.slice(lastIndex + 1);
-};
-
 // https://stackoverflow.com/questions/2936112/text-wrap-in-a-canvas-element
 getLines = (ctx, text, maxWidth) => {
   var words = text.split(" ");

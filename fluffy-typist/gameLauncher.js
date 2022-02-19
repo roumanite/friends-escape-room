@@ -16,6 +16,7 @@ function launch() {
     [],
     ['./assets/nokiafc22.ttf', './assets/story1.jpg', './assets/story2.jpg'],
     ['./assets/nokiafc22.ttf', './assets/tilesheet.png'],
+    [],
   ];
   
   let totalAssets = [];
@@ -47,7 +48,7 @@ function launch() {
   });
 
   const gameInfo = {
-    states: new Array(3).fill({}),
+    states: new Array(4).fill({}),
     currentState: 0,
     previousState: -1,
     input: '',
@@ -56,7 +57,7 @@ function launch() {
     switchState: function(level = this.currentState + 1) {
       cleanUpLevel();
       this.currentState = level;
-      this.sprites = gameInfo.states[this.currentState].sprites;
+      this.sprites = gameInfo.states[this.currentState].appendSprites ? this.sprites.concat(gameInfo.states[this.currentState].sprites) : gameInfo.states[this.currentState].sprites;
       Object.entries(gameInfo.states[this.currentState].listeners || {}).forEach(([e, callback]) => {
         window.addEventListener(e, callback);
       });
@@ -69,6 +70,10 @@ function launch() {
         gameInfo.switchState(gameInfo.previousState === -1 ? gameInfo.currentState + 1 : gameInfo.previousState);
       }
     }
+  };
+  gameInfo.states[gameInfo.states.length - 1] = {
+    ...stateBase,
+    appendSprites: true,
   };
 
   update();
@@ -103,34 +108,34 @@ function launch() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     gameInfo.sprites.forEach(sprite => {
       if (sprite.visible) {
-        let core = sprite.type === Types.IMAGE ? sprite[sprite.state] : sprite;
+        const core = sprite.state === undefined ? sprite : sprite[sprite.state];
         switch(sprite.type) {
           case Types.TEXT:
-            ctx.globalAlpha = sprite.alpha;
-            ctx.shadowColor = sprite.shadowColor;
-            ctx.shadowBlur = sprite.shadowBlur;
-            ctx.font = sprite.font;
-            ctx.fillStyle = sprite.color;
-            ctx.textBaseline = sprite.baseline;
-            ctx.fillText(sprite.text, core.x, core.y);
+            ctx.globalAlpha = core.alpha;
+            ctx.shadowColor = core.shadowColor;
+            ctx.shadowBlur = core.shadowBlur;
+            ctx.font = core.font;
+            ctx.fillStyle = core.color;
+            ctx.textBaseline = core.baseline;
+            ctx.fillText(core.text, core.x, core.y);
             break;
           case Types.TEXT_STROKE:
-            ctx.globalAlpha = sprite.alpha;
-            ctx.font = sprite.font;
-            ctx.strokeStyle = sprite.color;
-            ctx.textBaseline = sprite.baseline;
+            ctx.globalAlpha = core.alpha;
+            ctx.font = core.font;
+            ctx.strokeStyle = core.color;
+            ctx.textBaseline = core.baseline;
             ctx.lineWidth = sprite.width;
-            ctx.strokeText(sprite.text, sprite.x, sprite.y);
+            ctx.strokeText(core.text, core.x, core.y);
             break;
           case Types.IMAGE:
-              ctx.globalAlpha = core.alpha;
-              ctx.drawImage(
-                sprite.img,
-                core.sourceX, core.sourceY,
-                core.sourceWidth, core.sourceHeight,
-                core.x, core.y,
-                core.sourceWidth * core.scale, core.sourceHeight * core.scale,
-              )
+            ctx.globalAlpha = core.alpha;
+            ctx.drawImage(
+              sprite.img,
+              core.sourceX, core.sourceY,
+              core.sourceWidth, core.sourceHeight,
+              core.x, core.y,
+              core.sourceWidth * core.scale, core.sourceHeight * core.scale,
+            )
           case Types.RECTANGULAR:
             ctx.fillStyle = sprite.color;
             ctx.fillRect(core.x, core.y, core.width, core.height);

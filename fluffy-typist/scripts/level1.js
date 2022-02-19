@@ -20,17 +20,77 @@ function getLevel1Info(gameInfo, tilesheet) {
   }];
   const fluffy = {
     ...artBase,
+    BOW: 1,
+    HAPPY: 2,
+    SAD: 3,
     img: tilesheet,
     [artBase.INITIAL]: {
       ...artBase[artBase.INITIAL],
       sourceWidth: 285,
       sourceHeight: 301,
     },
+    1: {
+      ...artBase[artBase.INITIAL],
+      sourceX: 285,
+      sourceWidth: 285,
+      sourceHeight: 301,
+    },
+    2: {
+      ...artBase[artBase.INITIAL],
+      sourceY: 301,
+      sourceWidth: 285,
+      sourceHeight: 301,
+    },
+    3: {
+      ...artBase[artBase.INITIAL],
+      sourceX: 285,
+      sourceY: 301,
+      sourceWidth: 285,
+      sourceHeight: 301,
+    }
   };
+  const typewriter = {
+    ...artBase,
+    img: tilesheet,
+    [artBase.INITIAL]: {
+      ...artBase[artBase.INITIAL],
+      sourceWidth: 162,
+      sourceHeight: 45,
+      sourceY: 602,
+    },
+  }
+  const inputStart = {
+    ...artBase,
+    img: tilesheet,
+    [artBase.INITIAL]: {
+      ...artBase[artBase.INITIAL],
+      sourceY: 647,
+      sourceWidth: 10,
+      sourceHeight: 51,
+    },
+  };
+  const inputContent = {
+    ...rectBase,
+    color: transparentize(Colors.DARK_ORANGE, 0.7),
+    x: 10,
+  };
+  const wordBackgrounds = [
+    {
+      ...artBase,
+      img: tilesheet,
+      [artBase.INITIAL]: {
+        ...artBase[artBase.INITIAL],
+        sourceX: 947,
+        sourceY: 602,
+        sourceWidth: 24,
+        sourceHeight: 60,
+      },
+    }
+  ];
   const sprites = [{
     ...rectBase,
     color: Colors.LEMON,
-  }, fluffy];
+  }, fluffy, typewriter, inputStart, inputContent];
   const speeds = [2, 3, 5];
   let speedIndex = 0;
   const limit = [5, 10, 15];
@@ -50,12 +110,19 @@ function getLevel1Info(gameInfo, tilesheet) {
   return {
     ...stateBase,
     sprites: sprites,
-    update: () => {
+    maxMissedCount: 5,
+    update: function() {
       sprites[0].width = gameInfo.canvas.width;
       sprites[0].height = gameInfo.canvas.height;
       fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
       fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
+      inputStart[inputStart.state].y = gameInfo.canvas.height - inputStart[inputStart.state].sourceHeight * inputStart[inputStart.state].scale;
+      inputContent.y = gameInfo.canvas.height - 51;
+      inputContent.width = gameInfo.canvas.width - 10 * 2;
+      typewriter[typewriter.state].x = gameInfo.canvas.width / 2 - typewriter[typewriter.state].sourceWidth * typewriter[typewriter.state].scale / 2;
+      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight *typewriter[typewriter.state].scale;
       let spawnedCount = 0;
+      let missedCount = 0;
       sprites.forEach(sprite => {
         if (sprite.visible && sprite.vy !== undefined) {
           sprite.vy = speeds[speedIndex];
@@ -80,17 +147,25 @@ function getLevel1Info(gameInfo, tilesheet) {
         }
         if (sprite.y > gameInfo.canvas.height) {
           sprite.visible = false;
+          missedCount++;
           spawnedCount++;
         }
       });
       if (speedIndex < speeds.length-1 && spawnedCount >= limit[speedIndex]) {
         speedIndex++;
       }
+      if(missedCount >= this.maxMissedCount) {
+        fluffy.state = fluffy.SAD;
+        fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
+        fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
+        gameInfo.switchState(3);
+      }
     },
     listeners: {
-      'keydown': (e) => {
+      'keydown': e => {
         if (e.key >= "a" && e.key <= "z") {
           gameInfo.input += e.key;
+          fluffy.state = fluffy.BOW;
         }
         if (e.key === "Enter") {
           sprites.forEach(sprite => {
@@ -99,6 +174,11 @@ function getLevel1Info(gameInfo, tilesheet) {
               sprite.visible = false;
             }
           });
+        }
+      },
+      'keyup': e => {
+        if (fluffy.state === fluffy.BOW) {
+          fluffy.state = fluffy.INITIAL;
         }
       }
     }
