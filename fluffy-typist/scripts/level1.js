@@ -1,4 +1,4 @@
-function getLevel1Info(gameInfo) {
+function getLevel1Info(gameInfo, tilesheet) {
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
@@ -18,10 +18,19 @@ function getLevel1Info(gameInfo) {
     isCriteriaFulfilled: word => word.length === 8,
     count: 1,
   }];
+  const fluffy = {
+    ...artBase,
+    img: tilesheet,
+    [artBase.INITIAL]: {
+      ...artBase[artBase.INITIAL],
+      sourceWidth: 285,
+      sourceHeight: 301,
+    },
+  };
   const sprites = [{
     ...rectBase,
     color: Colors.LEMON,
-  }];
+  }, fluffy];
   const speeds = [2, 3, 5];
   let speedIndex = 0;
   const limit = [5, 10, 15];
@@ -44,6 +53,8 @@ function getLevel1Info(gameInfo) {
     update: () => {
       sprites[0].width = gameInfo.canvas.width;
       sprites[0].height = gameInfo.canvas.height;
+      fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
+      fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
       let spawnedCount = 0;
       sprites.forEach(sprite => {
         if (sprite.visible && sprite.vy !== undefined) {

@@ -15,7 +15,7 @@ function launch() {
   const assets = [
     [],
     ['./assets/nokiafc22.ttf', './assets/story1.jpg', './assets/story2.jpg'],
-    ['./assets/nokiafc22.ttf'],
+    ['./assets/nokiafc22.ttf', './assets/tilesheet.png'],
   ];
   
   let totalAssets = [];
@@ -91,7 +91,7 @@ function launch() {
           gameInfo.states[i] = getIntroInfo(gameInfo, assets[1][1], assets[1][2]);
           break;
         case 2:
-          gameInfo.states[i] = getLevel1Info(gameInfo);
+          gameInfo.states[i] = getLevel1Info(gameInfo, assets[2][1]);
           break;
         default:
           break;
