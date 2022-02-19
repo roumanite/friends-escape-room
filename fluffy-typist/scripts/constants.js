@@ -8,6 +8,8 @@ const Types = {
 const spriteBase = {
   type: Types.IMAGE,
   visible: true,
+  alpha: 1,
+  delta: 0,
 };
 
 const artBase =
@@ -18,6 +20,8 @@ const artBase =
 };
 artBase.state = artBase.INITIAL;
 artBase[artBase.INITIAL] = {
+  alpha: 1,
+  delta: 0,
   x: 0,
   y: 0,
   sourceX: 0,

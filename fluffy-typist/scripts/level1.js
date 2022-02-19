@@ -14,26 +14,21 @@ function getLevel1Info(gameInfo) {
   }, {
     isCriteriaFulfilled: word => word.length === 7,
     count: 10,
+  }, {
+    isCriteriaFulfilled: word => word.length === 8,
+    count: 1,
   }];
   const sprites = [{
     ...rectBase,
     color: Colors.LEMON,
-    width: gameInfo.canvas.width,
-    height: gameInfo.canvas.height,
   }];
-  const speeds = [1.5, 2, 3];
+  const speeds = [2, 3, 5];
   let speedIndex = 0;
   const limit = [5, 10, 15];
-  const ctx = gameInfo.canvas.getContext("2d");
   selectionGenerator.randomize(categories).forEach((result,i) => {
-    ctx.font = 'normal bold 30px nokia';
-    ctx.baseline = 'top';
-    let width = ctx.measureText(result.word).width;
-    const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
-    const x = randomNum * Math.ceil(width);
     sprites.push({
       ...textBase,
-      x: x,
+      x: 0,
       y: i,
       vy: speeds[0],
       text: result.word,
@@ -47,6 +42,8 @@ function getLevel1Info(gameInfo) {
     ...stateBase,
     sprites: sprites,
     update: () => {
+      sprites[0].width = gameInfo.canvas.width;
+      sprites[0].height = gameInfo.canvas.height;
       let spawnedCount = 0;
       sprites.forEach(sprite => {
         if (sprite.visible && sprite.vy !== undefined) {
@@ -54,8 +51,15 @@ function getLevel1Info(gameInfo) {
           sprite.y += sprite.vy;
         }
         if (sprite.timer !== undefined && sprite.timer <= 0) {
+          const ctx = gameInfo.canvas.getContext("2d");
           sprite.visible = true;
           sprite.timer = undefined;
+          ctx.font = sprite.font;
+          ctx.baseline = 'top';
+          let width = ctx.measureText(sprite.text).width;
+          const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
+          const x = randomNum * Math.ceil(width);
+          sprite.x = x;
         }
         if (sprite.timer === undefined && sprite.type === Types.TEXT) {
           spawnedCount++;
@@ -79,7 +83,7 @@ function getLevel1Info(gameInfo) {
         }
         if (e.key === "Enter") {
           sprites.forEach(sprite => {
-            if (sprite.type === TEXT && sprite.text === gameInfo.input) {
+            if (sprite.type === Types.TEXT && sprite.text === gameInfo.input) {
               gameInfo.input = '';
               sprite.visible = false;
             }

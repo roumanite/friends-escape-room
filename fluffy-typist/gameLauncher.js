@@ -7,9 +7,14 @@ function launch() {
   canvas.height = window.innerHeight;
   selectionGenerator.words = words;
 
+  window.onresize = function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
   const assets = [
     [],
-    ['./assets/nokiafc22.ttf', './assets/story.jpg'],
+    ['./assets/nokiafc22.ttf', './assets/story1.jpg', './assets/story2.jpg'],
     ['./assets/nokiafc22.ttf'],
   ];
   
@@ -20,47 +25,48 @@ function launch() {
   new Set(totalAssets).forEach(asset => {
     if (!asset.includes(".ttf")) {
       let tilesheet = loadTilesheet(asset, function() {
-        assets.forEach(levelAssets => {
+        assets.forEach((levelAssets, i) => {
           const idx = levelAssets.indexOf(asset);
           if (idx >= 0) {
             levelAssets[idx] = tilesheet;
+            initGameState(i);
           }
         });
       });
     }
   });
   loadFont('./assets/nokiafc22.ttf', 'nokia', function(font) {
-    assets.forEach(levelAssets => {
+    assets.forEach((levelAssets, i) => {
       document.fonts.add(font);
       const idx = levelAssets.indexOf("./assets/nokiafc22.ttf");
       if (idx >= 0) {
         levelAssets[idx] = font;
+        initGameState(i);
       }
     });
   });
 
-  let sprites = [];
-  let currentState = 0;
   const gameInfo = {
+    states: new Array(3).fill({}),
+    currentState: 0,
+    previousState: -1,
     input: '',
-    incrementLevel: () => {
-      Object.entries(gameStates[currentState].listeners || {}).forEach(([e, callback]) => {
-        window.removeEventListener(e, callback);
-      });
-      currentState++;
-      sprites = gameStates[currentState].sprites;
-      Object.entries(gameStates[currentState].listeners || {}).forEach(([e, callback]) => {
+    canvas: canvas,
+    sprites: [],
+    switchState: function(level = this.currentState + 1) {
+      cleanUpLevel();
+      this.currentState = level;
+      this.sprites = gameInfo.states[this.currentState].sprites;
+      Object.entries(gameInfo.states[this.currentState].listeners || {}).forEach(([e, callback]) => {
         window.addEventListener(e, callback);
       });
     },
-    canvas: canvas,
   }
-  const gameStates = new Array(3).fill({});
-  gameStates[0] = {
+  gameInfo.states[0] = {
     ...stateBase,
     update: () => {
-      if (Object.keys(gameStates[1]).length > 0) {
-        gameInfo.incrementLevel();
+      if (Object.keys(gameInfo.states[1]).length > 0) {
+        gameInfo.switchState(gameInfo.previousState === -1 ? gameInfo.currentState + 1 : gameInfo.previousState);
       }
     }
   };
@@ -68,38 +74,48 @@ function launch() {
   update();
   function update() {
     requestAnimationFrame(update);
-    assets.forEach((levelAssets, i) => {
-      if (levelAssets.every(asset => typeof(asset) !== 'string') && Object.keys(gameStates[i]).length === 0) {
-        switch(i) {
-          case 1:
-            gameStates[i] = getIntroInfo(gameInfo, levelAssets.find(asset => asset.constructor.name === "HTMLImageElement"));
-            break;
-          case 2:
-            gameStates[i] = getLevel1Info(gameInfo);
-            break;
-          default:
-            break;
-        }
-      }
-    });
-    gameStates[currentState].update();
+    gameInfo.states[gameInfo.currentState].update(gameInfo);
     render();
+  }
+
+  function cleanUpLevel() {
+    Object.entries(gameInfo.states[gameInfo.currentState].listeners || {}).forEach(([e, callback]) => {
+      window.removeEventListener(e, callback);
+    });
+  }
+
+  function initGameState(i) {
+    if (Object.keys(gameInfo.states[i]).length === 0 && assets[i].every(asset => typeof(asset) !== 'string')) {
+      switch(i) {
+        case 1:
+          gameInfo.states[i] = getIntroInfo(gameInfo, assets[1][1], assets[1][2]);
+          break;
+        case 2:
+          gameInfo.states[i] = getLevel1Info(gameInfo);
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sprites.forEach(sprite => {
+    gameInfo.sprites.forEach(sprite => {
       if (sprite.visible) {
+        let core = sprite.type === Types.IMAGE ? sprite[sprite.state] : sprite;
         switch(sprite.type) {
           case Types.TEXT:
-            ctx.shadowColor= sprite.shadowColor;
-            ctx.shadowBlur=sprite.shadowBlur;
+            ctx.globalAlpha = sprite.alpha;
+            ctx.shadowColor = sprite.shadowColor;
+            ctx.shadowBlur = sprite.shadowBlur;
             ctx.font = sprite.font;
             ctx.fillStyle = sprite.color;
             ctx.textBaseline = sprite.baseline;
-            ctx.fillText(sprite.text, sprite.x, sprite.y);
+            ctx.fillText(sprite.text, core.x, core.y);
             break;
           case Types.TEXT_STROKE:
+            ctx.globalAlpha = sprite.alpha;
             ctx.font = sprite.font;
             ctx.strokeStyle = sprite.color;
             ctx.textBaseline = sprite.baseline;
@@ -107,17 +123,17 @@ function launch() {
             ctx.strokeText(sprite.text, sprite.x, sprite.y);
             break;
           case Types.IMAGE:
-            const sp = sprite[sprite.state];
-            ctx.drawImage(
-              sprite.img,
-              sp.sourceX, sp.sourceY,
-              sp.sourceWidth, sp.sourceHeight,
-              sp.x, sp.y,
-              sp.sourceWidth * sp.scale, sp.sourceHeight * sp.scale,
-            )
+              ctx.globalAlpha = core.alpha;
+              ctx.drawImage(
+                sprite.img,
+                core.sourceX, core.sourceY,
+                core.sourceWidth, core.sourceHeight,
+                core.x, core.y,
+                core.sourceWidth * core.scale, core.sourceHeight * core.scale,
+              )
           case Types.RECTANGULAR:
             ctx.fillStyle = sprite.color;
-            ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+            ctx.fillRect(core.x, core.y, core.width, core.height);
             break;
           default:
             break;
