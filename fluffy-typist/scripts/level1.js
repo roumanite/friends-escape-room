@@ -8,6 +8,12 @@ function getLevel1Info(gameInfo) {
   },{
     isCriteriaFulfilled: word => word.length === 5,
     count: 10,
+  }, {
+    isCriteriaFulfilled: word => word.length === 6,
+    count: 10,
+  }, {
+    isCriteriaFulfilled: word => word.length === 7,
+    count: 10,
   }];
   const sprites = [{
     ...rectBase,
@@ -15,7 +21,7 @@ function getLevel1Info(gameInfo) {
     width: gameInfo.canvas.width,
     height: gameInfo.canvas.height,
   }];
-  const speeds = [0.3, 0.5, 1];
+  const speeds = [1.5, 2, 3];
   let speedIndex = 0;
   const limit = [5, 10, 15];
   const ctx = gameInfo.canvas.getContext("2d");
@@ -23,14 +29,16 @@ function getLevel1Info(gameInfo) {
     ctx.font = 'normal bold 30px nokia';
     ctx.baseline = 'top';
     let width = ctx.measureText(result.word).width;
+    const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
+    const x = randomNum * Math.ceil(width);
     sprites.push({
       ...textBase,
-      x: Math.floor(Math.random() * gameInfo.canvas.width/width) * width,
+      x: x,
       y: i,
       vy: speeds[0],
       text: result.word,
       font: 'normal bold 30px nokia',
-      color: 'rgb(91,85,1)',
+      color: Colors.DARK_YELLOW,
       visible: false,
       timer: i * 38,
     });
@@ -49,7 +57,7 @@ function getLevel1Info(gameInfo) {
           sprite.visible = true;
           sprite.timer = undefined;
         }
-        if (sprite.timer === undefined && sprite.type === TEXT) {
+        if (sprite.timer === undefined && sprite.type === Types.TEXT) {
           spawnedCount++;
         }
         if (sprite.timer !== undefined && sprite.timer > 0) {

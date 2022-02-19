@@ -90,31 +90,37 @@ function launch() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     sprites.forEach(sprite => {
       if (sprite.visible) {
-        if (sprite.type === TEXT) {
-          ctx.shadowColor= sprite.shadowColor;
-          ctx.shadowBlur=sprite.shadowBlur;
-          ctx.font = sprite.font;
-          ctx.fillStyle = sprite.color;
-          ctx.textBaseline = sprite.baseline;
-          ctx.fillText(sprite.text, sprite.x, sprite.y);
-        } else if (sprite.type === STROKE) {
-          ctx.font = sprite.font;
-          ctx.strokeStyle = sprite.color;
-          ctx.textBaseline = sprite.baseline;
-          ctx.lineWidth = sprite.width;
-          ctx.strokeText(sprite.text, sprite.x, sprite.y);
-        } else if (sprite.type === NON_TEXT) {
-          const sp = sprite[sprite.state];
-          ctx.drawImage(
-            sprite.img,
-            sp.sourceX, sp.sourceY,
-            sp.sourceWidth, sp.sourceHeight,
-            sp.x, sp.y,
-            sp.sourceWidth * sp.scale, sp.sourceHeight * sp.scale,
-          )
-        } else {
-          ctx.fillStyle = sprite.color;
-          ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+        switch(sprite.type) {
+          case Types.TEXT:
+            ctx.shadowColor= sprite.shadowColor;
+            ctx.shadowBlur=sprite.shadowBlur;
+            ctx.font = sprite.font;
+            ctx.fillStyle = sprite.color;
+            ctx.textBaseline = sprite.baseline;
+            ctx.fillText(sprite.text, sprite.x, sprite.y);
+            break;
+          case Types.TEXT_STROKE:
+            ctx.font = sprite.font;
+            ctx.strokeStyle = sprite.color;
+            ctx.textBaseline = sprite.baseline;
+            ctx.lineWidth = sprite.width;
+            ctx.strokeText(sprite.text, sprite.x, sprite.y);
+            break;
+          case Types.IMAGE:
+            const sp = sprite[sprite.state];
+            ctx.drawImage(
+              sprite.img,
+              sp.sourceX, sp.sourceY,
+              sp.sourceWidth, sp.sourceHeight,
+              sp.x, sp.y,
+              sp.sourceWidth * sp.scale, sp.sourceHeight * sp.scale,
+            )
+          case Types.RECTANGULAR:
+            ctx.fillStyle = sprite.color;
+            ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+            break;
+          default:
+            break;
         }
       }
     });

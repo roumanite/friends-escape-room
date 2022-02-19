@@ -1,10 +1,12 @@
-const NON_TEXT = 'NON-TEXT';
-const TEXT = 'TEXT';
-const SHAPE = 'SHAPE';
-const STROKE = 'STROKE';
+const Types = {
+  TEXT: '0',
+  IMAGE: '1',
+  RECTANGULAR: '2',
+  TEXT_STROKE: '3',
+};
 
 const spriteBase = {
-  type: NON_TEXT,
+  type: Types.IMAGE,
   visible: true,
 };
 
@@ -28,7 +30,7 @@ artBase[artBase.INITIAL] = {
 
 const textBase = {
   ...spriteBase,
-  type: TEXT,
+  type: Types.TEXT,
   font: '',
   baseline: 'top',
   shadowColor: 'black',
@@ -37,7 +39,7 @@ const textBase = {
 
 const rectBase = {
   ...spriteBase,
-  type: SHAPE,
+  type: Types.RECTANGULAR,
   width: 100,
   height: 100,
   x: 0,
