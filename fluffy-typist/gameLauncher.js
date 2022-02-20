@@ -16,7 +16,7 @@ function launch() {
     [],
     ['./assets/nokiafc22.ttf', './assets/story1.jpg', './assets/story2.jpg'],
     ['./assets/nokiafc22.ttf', './assets/tilesheet.png'],
-    [],
+    ['./assets/nokiafc22.ttf', './assets/story3.jpg', './assets/story4.jpg'],
   ];
   
   let totalAssets = [];
@@ -56,7 +56,7 @@ function launch() {
     switchState: function(level = this.currentState + 1) {
       cleanUpLevel();
       this.currentState = level;
-      this.sprites = gameInfo.states[this.currentState].appendSprites ? this.sprites.concat(gameInfo.states[this.currentState].sprites) : gameInfo.states[this.currentState].sprites;
+      this.sprites = gameInfo.states[this.currentState].sprites;
       Object.entries(gameInfo.states[this.currentState].listeners || {}).forEach(([e, callback]) => {
         window.addEventListener(e, callback);
       });
@@ -70,7 +70,6 @@ function launch() {
       }
     }
   };
-  gameInfo.states[gameInfo.states.length - 1] = getGameEndInfo();
 
   update();
   function update() {
@@ -89,11 +88,13 @@ function launch() {
     if (Object.keys(gameInfo.states[i]).length === 0 && assets[i].every(asset => typeof(asset) !== 'string')) {
       switch(i) {
         case 1:
-          gameInfo.states[i] = getIntroInfo(assets[1][1], assets[1][2]);
+          gameInfo.states[i] = getIntroInfo(assets[i][1], assets[i][2]);
           break;
         case 2:
-          gameInfo.states[i] = getLevel1Info(gameInfo, assets[2][1]);
+          gameInfo.states[i] = getLevel1Info(assets[i][1]);
           break;
+        case 3:
+          gameInfo.states[i] = getGameEndInfo(assets[i][1], assets[i][2]);
         default:
           break;
       }

@@ -1,4 +1,4 @@
-function getLevel1Info(gameInfo, tilesheet) {
+function getLevel1Info(tilesheet) {
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
@@ -100,34 +100,17 @@ function getLevel1Info(gameInfo, tilesheet) {
       },
     }
   ];
-  const sprites = [{
-    ...rectBase,
-    color: Colors.LEMON,
-  }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
-  const speeds = [0.3, 0.5, 0.7];
-  let speedIndex = 0;
-  const limit = [5, 10, 15];
-  let totalWordsToSpawn = 0;
-  selectionGenerator.randomize(categories).forEach((result,i) => {
-    sprites.push({
-      ...textBase,
-      type: Types.WORD_SPAWN,
-      x: 0,
-      y: i,
-      vy: speeds[0],
-      text: result.word,
-      font: 'normal bold 30px nokia',
-      color: Colors.DARK_YELLOW,
-      visible: false,
-      timer: i * 38,
-    });
-    totalWordsToSpawn++;
-  });
+  let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
   return {
     ...stateBase,
-    sprites: sprites,
+    get sprites() {
+      initSprites();
+      return sprites;
+    },
     maxMissedCount: 5,
-    update: function() {
+    update: function(gameInfo) {
+      const speeds = [0.3, 0.5, 0.7];
+      const limit = [5, 10, 15];
       sprites[0].width = gameInfo.canvas.width;
       sprites[0].height = gameInfo.canvas.height;
       fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
@@ -137,7 +120,22 @@ function getLevel1Info(gameInfo, tilesheet) {
       inputContent.width = gameInfo.canvas.width - 10 * 2;
       typewriter[typewriter.state].x = gameInfo.canvas.width / 2 - typewriter[typewriter.state].sourceWidth * typewriter[typewriter.state].scale / 2;
       typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight * typewriter[typewriter.state].scale;
-      const width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
+      
+      if (shouldRestart) {
+        const stateBeforeReset = fluffy.state;
+        gameInfo.switchState(stateBeforeReset === fluffy.SAD ? 1 : 3);
+        return;
+      }
+
+      if (fluffy.state === fluffy.SAD) {
+        return;
+      }
+
+      let width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
+      if (width >= inputContent.width - 100) {
+        inputText.text = inputText.text.slice(0, -1);
+        width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
+      }
       underscore.x = inputText.x + width;
       underscore.y = inputContent.y + 12;
       inputText.y = underscore.y;
@@ -184,28 +182,24 @@ function getLevel1Info(gameInfo, tilesheet) {
       }
       if (missedCount >= this.maxMissedCount) {
         fluffy.state = fluffy.SAD;
-        fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
-        fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
-        gameInfo.switchState(3);
       } else if (wordEndOfLifeCount === totalWordsToSpawn) {
         fluffy.state = fluffy.HAPPY;
-        fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
-        fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
-        gameInfo.switchState(3);
+        shouldRestart = true;
       }
     },
     listeners: {
       'keydown': e => {
-        const width = getTextWidth(gameInfo.canvas, inputText.font, gameInfo.input);
-        if (((e.key >= "a" && e.key <= "z") || e.key === " ") && width < inputContent.width - 100) {
+        if ((e.key >= "a" && e.key <= "z") || e.key === " ") {
           inputText.text += e.key;
           fluffy.state = fluffy.BOW;
-        }
-        if (e.key === "Backspace") {
+        } else if (e.key === "Backspace") {
           inputText.text = inputText.text.slice(0, -1);
           fluffy.state = fluffy.BOW;
-        }
-        if (e.key === "Enter") {
+        } else if (e.key === "Enter") {
+          if (fluffy.state === fluffy.SAD) {
+            shouldRestart = true;
+            return;
+          }
           sprites.forEach(sprite => {
             if (sprite.type === Types.WORD_SPAWN && sprite.text === inputText.text) {
               inputText.text = '';
@@ -219,7 +213,32 @@ function getLevel1Info(gameInfo, tilesheet) {
         if (fluffy.state === fluffy.BOW) {
           fluffy.state = fluffy.INITIAL;
         }
-      }
+      },
     }
   };
+
+  function initSprites() {
+    fluffy.state = fluffy.INITIAL;
+    inputText.text = '';
+    sprites = [{
+      ...rectBase,
+      color: Colors.LEMON,
+    }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
+    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
+    selectionGenerator.randomize(categories).forEach((result,i) => {
+      sprites.push({
+        ...textBase,
+        type: Types.WORD_SPAWN,
+        x: 0,
+        y: i,
+        vy: 0,
+        text: result.word,
+        font: 'normal bold 30px nokia',
+        color: Colors.DARK_YELLOW,
+        visible: false,
+        timer: i * 38,
+      });
+      totalWordsToSpawn++;
+    });
+  }
 }
