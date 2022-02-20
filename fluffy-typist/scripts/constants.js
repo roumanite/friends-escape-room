@@ -3,6 +3,7 @@ const Types = {
   IMAGE: '1',
   RECTANGULAR: '2',
   TEXT_STROKE: '3',
+  WORD_SPAWN: '4',
 };
 
 const spriteBase = {

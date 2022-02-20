@@ -1,5 +1,4 @@
 function getLevel1Info(gameInfo, tilesheet) {
-  const ctx = gameInfo.canvas.getContext("2d");
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
@@ -83,7 +82,7 @@ function getLevel1Info(gameInfo, tilesheet) {
   };
   const inputText = {
     ...textBase,
-    text: gameInfo.input,
+    text: '',
     font: 'normal bold 30px nokia',
     color: Colors.BLACK,
     x: 27,
@@ -105,12 +104,14 @@ function getLevel1Info(gameInfo, tilesheet) {
     ...rectBase,
     color: Colors.LEMON,
   }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
-  const speeds = [2, 3, 5];
+  const speeds = [0.3, 0.5, 0.7];
   let speedIndex = 0;
   const limit = [5, 10, 15];
+  let totalWordsToSpawn = 0;
   selectionGenerator.randomize(categories).forEach((result,i) => {
     sprites.push({
       ...textBase,
+      type: Types.WORD_SPAWN,
       x: 0,
       y: i,
       vy: speeds[0],
@@ -120,6 +121,7 @@ function getLevel1Info(gameInfo, tilesheet) {
       visible: false,
       timer: i * 38,
     });
+    totalWordsToSpawn++;
   });
   return {
     ...stateBase,
@@ -135,47 +137,58 @@ function getLevel1Info(gameInfo, tilesheet) {
       inputContent.width = gameInfo.canvas.width - 10 * 2;
       typewriter[typewriter.state].x = gameInfo.canvas.width / 2 - typewriter[typewriter.state].sourceWidth * typewriter[typewriter.state].scale / 2;
       typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight * typewriter[typewriter.state].scale;
-      ctx.font = inputText.font;
-      ctx.baseline = 'top';
-      let width = ctx.measureText(gameInfo.input).width;
+      const width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
       underscore.x = inputText.x + width;
       underscore.y = inputContent.y + 12;
-      inputText.text = gameInfo.input;
       inputText.y = underscore.y;
       let spawnedCount = 0;
       let missedCount = 0;
+      let wordEndOfLifeCount = 0;
       sprites.forEach(sprite => {
-        if (sprite.visible && sprite.vy !== undefined) {
-          sprite.vy = speeds[speedIndex];
-          sprite.y += sprite.vy;
+        const core = sprite.state === undefined ? sprite : sprite[sprite.state];
+        // Update y
+        if (sprite.visible && core.vy !== undefined) {
+          core.vy = speeds[speedIndex];
+          core.y += core.vy;
         }
-        if (sprite.timer !== undefined && sprite.timer <= 0) {
-          sprite.visible = true;
-          sprite.timer = undefined;
-          ctx.font = sprite.font;
-          ctx.baseline = 'top';
-          let width = ctx.measureText(sprite.text).width;
-          const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
-          const x = randomNum * Math.ceil(width);
-          sprite.x = x;
+        if (core.timer !== undefined) {
+          if (core.timer <= 0) {
+            sprite.visible = true;
+            core.timer = undefined;
+            if (sprite.type === Types.WORD_SPAWN) {
+              const width = getTextWidth(gameInfo.canvas, sprite.font, sprite.text);
+              const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
+              const x = randomNum * Math.ceil(width);
+              sprite.x = x;
+            }
+          } else {
+            core.timer -= speeds[speedIndex] * 1;
+          }
         }
-        if (sprite.timer === undefined && sprite.type === Types.TEXT) {
-          spawnedCount++;
-        }
-        if (sprite.timer !== undefined && sprite.timer > 0) {
-          sprite.timer -= speeds[speedIndex] * 1;
-        }
-        if (sprite.y > gameInfo.canvas.height) {
-          sprite.visible = false;
-          missedCount++;
-          spawnedCount++;
+
+        if (sprite.type === Types.WORD_SPAWN) {
+          if (core.y > gameInfo.canvas.height) {
+            sprite.visible = false;
+            missedCount++;
+          }
+          if (core.timer === undefined) {
+            spawnedCount++;
+            if (!sprite.visible) {
+              wordEndOfLifeCount++;
+            }
+          }
         }
       });
       if (speedIndex < speeds.length-1 && spawnedCount >= limit[speedIndex]) {
         speedIndex++;
       }
-      if(missedCount >= this.maxMissedCount) {
+      if (missedCount >= this.maxMissedCount) {
         fluffy.state = fluffy.SAD;
+        fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
+        fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
+        gameInfo.switchState(3);
+      } else if (wordEndOfLifeCount === totalWordsToSpawn) {
+        fluffy.state = fluffy.HAPPY;
         fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
         fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
         gameInfo.switchState(3);
@@ -183,21 +196,21 @@ function getLevel1Info(gameInfo, tilesheet) {
     },
     listeners: {
       'keydown': e => {
-        ctx.font = inputText.font;
-        ctx.baseline = 'top';
-        let width = ctx.measureText(gameInfo.input).width;
-        if (e.key >= "a" && e.key <= "z" && width < inputContent.width - 100) {
-          gameInfo.input += e.key;
+        const width = getTextWidth(gameInfo.canvas, inputText.font, gameInfo.input);
+        if (((e.key >= "a" && e.key <= "z") || e.key === " ") && width < inputContent.width - 100) {
+          inputText.text += e.key;
           fluffy.state = fluffy.BOW;
         }
         if (e.key === "Backspace") {
-          gameInfo.input = gameInfo.input.slice(0, -1);
+          inputText.text = inputText.text.slice(0, -1);
+          fluffy.state = fluffy.BOW;
         }
         if (e.key === "Enter") {
           sprites.forEach(sprite => {
-            if (sprite.type === Types.TEXT && sprite.text === gameInfo.input) {
-              gameInfo.input = '';
+            if (sprite.type === Types.WORD_SPAWN && sprite.text === inputText.text) {
+              inputText.text = '';
               sprite.visible = false;
+              sprite.timer = undefined;
             }
           });
         }

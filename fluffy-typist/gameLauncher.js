@@ -51,7 +51,6 @@ function launch() {
     states: new Array(4).fill({}),
     currentState: 0,
     previousState: -1,
-    input: '',
     canvas: canvas,
     sprites: [],
     switchState: function(level = this.currentState + 1) {
@@ -71,10 +70,7 @@ function launch() {
       }
     }
   };
-  gameInfo.states[gameInfo.states.length - 1] = {
-    ...stateBase,
-    appendSprites: true,
-  };
+  gameInfo.states[gameInfo.states.length - 1] = getGameEndInfo();
 
   update();
   function update() {
@@ -93,7 +89,7 @@ function launch() {
     if (Object.keys(gameInfo.states[i]).length === 0 && assets[i].every(asset => typeof(asset) !== 'string')) {
       switch(i) {
         case 1:
-          gameInfo.states[i] = getIntroInfo(gameInfo, assets[1][1], assets[1][2]);
+          gameInfo.states[i] = getIntroInfo(assets[1][1], assets[1][2]);
           break;
         case 2:
           gameInfo.states[i] = getLevel1Info(gameInfo, assets[2][1]);
@@ -111,6 +107,7 @@ function launch() {
         const core = sprite.state === undefined ? sprite : sprite[sprite.state];
         switch(sprite.type) {
           case Types.TEXT:
+          case Types.WORD_SPAWN:
             ctx.globalAlpha = core.alpha;
             ctx.shadowColor = core.shadowColor;
             ctx.shadowBlur = core.shadowBlur;

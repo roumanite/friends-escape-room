@@ -1,4 +1,4 @@
-function getIntroInfo(gameInfo, ts1, ts2) {
+function getIntroInfo(ts1, ts2) {
   const story1 = {
     ...artBase,
     img: ts1,
@@ -27,6 +27,7 @@ function getIntroInfo(gameInfo, ts1, ts2) {
       sourceHeight: ts2.height,
     }
   };
+  let shouldSwitch = false;
   return {
     ...stateBase,
     sprites: [
@@ -72,22 +73,27 @@ function getIntroInfo(gameInfo, ts1, ts2) {
       width: 10,
       shadowColor: Colors.DARK_BLUE,
     }],
-    update: function() {
-      [story1, story2].forEach(story => {
-        story[story.state].scale = gameInfo.canvas.width/story.img.width;
-        story[story.state].alpha = Math.max(0, Math.min(1, story[story.state].alpha + story[story.state].delta));
-        if (story[story.state].alpha <= 0 || story[story.state].alpha >= 1){
-          story[story.state].delta = -story[story.state].delta;
+    update: function(gameInfo) {
+      if (shouldSwitch) {
+        gameInfo.switchState();
+        shouldSwitch = false;
+      } else {
+        [story1, story2].forEach(story => {
+          story[story.state].scale = gameInfo.canvas.width/story.img.width;
+          story[story.state].alpha = Math.max(0, Math.min(1, story[story.state].alpha + story[story.state].delta));
+          if (story[story.state].alpha <= 0 || story[story.state].alpha >= 1){
+            story[story.state].delta = -story[story.state].delta;
+          }
+        });
+        if (story1[story1.state].alpha >= 0.3 && story2[story2.state].delta === 0) {
+          story2[story2.state].delta = 0.004;
         }
-      });
-      if (story1[story1.state].alpha >= 0.3 && story2[story2.state].delta === 0) {
-        story2[story2.state].delta = 0.004;
       }
     },
     listeners: {
       'keydown': function(e) {
         if (e.key === 'Enter') {
-          gameInfo.switchState();
+          shouldSwitch = true;
         }
       }
     }
