@@ -1,38 +1,40 @@
 function getGameEndInfo(ts1, ts2) {
-  const gameEndMsg = {
-    ...textBase,
+  const gameEndMsg = createSprite({
+    type: Types.TEXT,
     text: 'Restaurant Menu finished!',
     font: 'normal bold 50px nokia',
     visible: true,
-  };
-  const story3 = {
-    ...artBase,
+  });
+  const story3 = createSprite({
+    type: Types.IMAGE,
     img: ts1,
-    [artBase.INITIAL]: {
-      ...artBase[artBase.INITIAL],
-      x: 0,
-      y: 0,
-      sourceX: 0,
-      sourceY: 0,
-      sourceWidth: ts1.width,
-      sourceHeight: ts1.height,
-      delta: -0.004,
+    states: {
+      INITIAL: {
+        x: 0,
+        y: 0,
+        sourceX: 0,
+        sourceY: 0,
+        sourceWidth: ts1.width,
+        sourceHeight: ts1.height,
+        delta: -0.004,
+      }
     }
-  };
-  const story4 = {
-    ...artBase,
+  });
+  const story4 = createSprite({
+    type: Types.IMAGE,
     img: ts2,
-    [artBase.INITIAL]: {
-      ...artBase[artBase.INITIAL],
-      x: 0,
-      y: 0,
-      alpha: 0,
-      sourceX: 0,
-      sourceY: 0,
-      sourceWidth: ts2.width,
-      sourceHeight: ts2.height,
+    states: {
+      INITIAL: {
+        x: 0,
+        y: 0,
+        alpha: 0,
+        sourceX: 0,
+        sourceY: 0,
+        sourceWidth: ts2.width,
+        sourceHeight: ts2.height,
+      },
     }
-  };
+  });
   let shouldSwitch = false;
   return {
     ...stateBase,
@@ -46,8 +48,8 @@ function getGameEndInfo(ts1, ts2) {
         gameInfo.switchState(1);
         shouldSwitch = false;
       } else {
-        gameEndMsg.x = getHorizontalCenteredPosition(gameInfo.canvas, gameEndMsg.font, gameEndMsg.text);
-        gameEndMsg.y = getVerticalCenteredPosition(gameInfo.canvas, gameEndMsg.font, gameEndMsg.text);
+        gameEndMsg.x = centerTextHorizontally(gameInfo.canvas, gameEndMsg);
+        gameEndMsg.y = centerTextVertically(gameInfo.canvas, gameEndMsg);
         [story3, story4].forEach(story => {
           story[story.state].scale = gameInfo.canvas.width/story.img.width;
           story[story.state].alpha = Math.max(0, Math.min(1, story[story.state].alpha + story[story.state].delta));

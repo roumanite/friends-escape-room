@@ -105,38 +105,37 @@ function launch() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     gameInfo.sprites.forEach(sprite => {
       if (sprite.visible) {
-        const core = sprite.state === undefined ? sprite : sprite[sprite.state];
         switch(sprite.type) {
           case Types.TEXT:
           case Types.WORD_SPAWN:
-            ctx.globalAlpha = core.alpha;
-            ctx.shadowColor = core.shadowColor;
-            ctx.shadowBlur = core.shadowBlur;
-            ctx.font = core.font;
-            ctx.fillStyle = core.color;
-            ctx.textBaseline = core.baseline;
-            ctx.fillText(core.text, core.x, core.y);
+            ctx.globalAlpha = sprite.alpha;
+            ctx.shadowColor = sprite.shadowColor;
+            ctx.shadowBlur = sprite.shadowBlur;
+            ctx.font = sprite.font;
+            ctx.fillStyle = sprite.color;
+            ctx.textBaseline = sprite.baseline;
+            ctx.fillText(sprite.text, sprite.x, sprite.y);
             break;
           case Types.TEXT_STROKE:
-            ctx.globalAlpha = core.alpha;
-            ctx.font = core.font;
-            ctx.strokeStyle = core.color;
-            ctx.textBaseline = core.baseline;
+            ctx.globalAlpha = sprite.alpha;
+            ctx.font = sprite.font;
+            ctx.strokeStyle = sprite.color;
+            ctx.textBaseline = sprite.baseline;
             ctx.lineWidth = sprite.width;
-            ctx.strokeText(core.text, core.x, core.y);
+            ctx.strokeText(sprite.text, sprite.x, sprite.y);
             break;
           case Types.IMAGE:
-            ctx.globalAlpha = core.alpha;
+            ctx.globalAlpha = sprite.alpha;
             ctx.drawImage(
               sprite.img,
-              core.sourceX, core.sourceY,
-              core.sourceWidth, core.sourceHeight,
-              core.x, core.y,
-              core.sourceWidth * core.scale, core.sourceHeight * core.scale,
+              sprite.sourceX, sprite.sourceY,
+              sprite.sourceWidth, sprite.sourceHeight,
+              sprite.x, sprite.y,
+              sprite.sourceWidth * sprite.scale, sprite.sourceHeight * sprite.scale,
             )
           case Types.RECTANGULAR:
             ctx.fillStyle = sprite.color;
-            ctx.fillRect(core.x, core.y, core.width, core.height);
+            ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
             break;
           default:
             break;

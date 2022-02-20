@@ -18,87 +18,85 @@ function getLevel1Info(tilesheet) {
     isCriteriaFulfilled: word => word.length === 8,
     count: 1,
   }];
-  const fluffy = {
-    ...artBase,
-    BOW: 1,
-    HAPPY: 2,
-    SAD: 3,
+  const fluffy = createSprite({
+    type: Types.IMAGE,
     img: tilesheet,
-    [artBase.INITIAL]: {
-      ...artBase[artBase.INITIAL],
-      sourceWidth: 285,
-      sourceHeight: 301,
+    states: {
+      INITIAL: {
+        sourceWidth: 285,
+        sourceHeight: 301,
+      },
+      BOW: {
+        sourceX: 285,
+        sourceWidth: 285,
+        sourceHeight: 301,
+      },
+      HAPPY: {
+        sourceY: 301,
+        sourceWidth: 285,
+        sourceHeight: 301,
+      },
+      SAD: {
+        sourceX: 285,
+        sourceY: 301,
+        sourceWidth: 285,
+        sourceHeight: 301,
+      }
     },
-    1: {
-      ...artBase[artBase.INITIAL],
-      sourceX: 285,
-      sourceWidth: 285,
-      sourceHeight: 301,
-    },
-    2: {
-      ...artBase[artBase.INITIAL],
-      sourceY: 301,
-      sourceWidth: 285,
-      sourceHeight: 301,
-    },
-    3: {
-      ...artBase[artBase.INITIAL],
-      sourceX: 285,
-      sourceY: 301,
-      sourceWidth: 285,
-      sourceHeight: 301,
-    }
-  };
-  const typewriter = {
-    ...artBase,
+  });
+  const typewriter = createSprite({
+    type: Types.IMAGE,
     img: tilesheet,
-    [artBase.INITIAL]: {
-      ...artBase[artBase.INITIAL],
-      sourceWidth: 162,
-      sourceHeight: 45,
-      sourceY: 602,
+    states: {
+      INITIAL: {
+        sourceWidth: 162,
+        sourceHeight: 45,
+        sourceY: 602,
+      },
     },
-  }
-  const inputStart = {
-    ...artBase,
+  });
+  const inputStart = createSprite({
+    type: Types.IMAGE,
     img: tilesheet,
-    [artBase.INITIAL]: {
-      ...artBase[artBase.INITIAL],
-      sourceY: 647,
-      sourceWidth: 10,
-      sourceHeight: 51,
+    states: {
+      INITIAL: {
+        sourceY: 647,
+        sourceWidth: 10,
+        sourceHeight: 51,
+      },
     },
-  };
-  const inputContent = {
-    ...rectBase,
+  });
+  const inputContent = createSprite({
+    type: Types.RECTANGULAR,
     color: transparentize(Colors.DARK_ORANGE, 0.7),
     x: 10,
-  };
-  const underscore = {
-    ...textBase,
+  });
+  const underscore = createSprite({
+    type: Types.TEXT,
     text: '_',
     font: 'normal bold 30px nokia',
     color: Colors.BLACK,
-  };
-  const inputText = {
-    ...textBase,
+  });
+  const inputText = createSprite({
+    type: Types.TEXT,
     text: '',
     font: 'normal bold 30px nokia',
     color: Colors.BLACK,
     x: 27,
-  }
+  });
   const wordBackgrounds = [
-    {
-      ...artBase,
+    createSprite({
+      type: Types.IMAGE,
       img: tilesheet,
-      [artBase.INITIAL]: {
-        ...artBase[artBase.INITIAL],
-        sourceX: 947,
-        sourceY: 602,
-        sourceWidth: 24,
-        sourceHeight: 60,
+      states: {
+        INITIAL: {
+          sourceX: 947,
+          sourceY: 602,
+          sourceWidth: 24,
+          sourceHeight: 60,
+        },
       },
-    }
+    })
   ];
   let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
   return {
@@ -113,13 +111,13 @@ function getLevel1Info(tilesheet) {
       const limit = [5, 10, 15];
       sprites[0].width = gameInfo.canvas.width;
       sprites[0].height = gameInfo.canvas.height;
-      fluffy[fluffy.state].x = gameInfo.canvas.width / 2 - fluffy[fluffy.state].sourceWidth * fluffy[fluffy.state].scale / 2;
-      fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy[fluffy.state].sourceHeight * fluffy[fluffy.state].scale;
-      inputStart[inputStart.state].y = gameInfo.canvas.height - inputStart[inputStart.state].sourceHeight * inputStart[inputStart.state].scale;
+      fluffy[fluffy.state].x = centerSpriteHorizontally(gameInfo.canvas, fluffy);
+      fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy.sourceHeight * fluffy.scale;
+      inputStart[inputStart.state].y = gameInfo.canvas.height - inputStart.sourceHeight * inputStart.scale;
       inputContent.y = gameInfo.canvas.height - 51;
       inputContent.width = gameInfo.canvas.width - 10 * 2;
-      typewriter[typewriter.state].x = gameInfo.canvas.width / 2 - typewriter[typewriter.state].sourceWidth * typewriter[typewriter.state].scale / 2;
-      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter[typewriter.state].sourceHeight * typewriter[typewriter.state].scale;
+      typewriter[typewriter.state].x = centerSpriteHorizontally(gameInfo.canvas, typewriter);
+      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter.sourceHeight * typewriter.scale;
       
       if (shouldRestart) {
         const stateBeforeReset = fluffy.state;
@@ -131,10 +129,10 @@ function getLevel1Info(tilesheet) {
         return;
       }
 
-      let width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
+      let width = getTextWidth(gameInfo.canvas, inputText);
       if (width >= inputContent.width - 100) {
         inputText.text = inputText.text.slice(0, -1);
-        width = getTextWidth(gameInfo.canvas, inputText.font, inputText.text);
+        width = getTextWidth(gameInfo.canvas, inputText);
       }
       underscore.x = inputText.x + width;
       underscore.y = inputContent.y + 12;
@@ -154,7 +152,7 @@ function getLevel1Info(tilesheet) {
             sprite.visible = true;
             core.timer = undefined;
             if (sprite.type === Types.WORD_SPAWN) {
-              const width = getTextWidth(gameInfo.canvas, sprite.font, sprite.text);
+              const width = getTextWidth(gameInfo.canvas, sprite);
               const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/width));
               const x = randomNum * Math.ceil(width);
               sprite.x = x;
@@ -225,7 +223,7 @@ function getLevel1Info(tilesheet) {
       color: Colors.LEMON,
     }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
     totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
-    selectionGenerator.randomize(categories).forEach((result,i) => {
+    selectionGenerator.randomize(categories).forEach((result, i) => {
       sprites.push({
         ...textBase,
         type: Types.WORD_SPAWN,
