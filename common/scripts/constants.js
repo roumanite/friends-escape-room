@@ -10,4 +10,5 @@ const Colors = {
   BLACK: 'rgba(0, 0, 0, 1)',
   DARK_BROWN: 'rgba(80, 69, 56, 1)',
   LIGHT_YELLOW: 'rgba(245, 243, 204, 1)',
+  GREEN_CYAN: 'rgba(104, 237, 203, 1)',
 };

@@ -2,7 +2,7 @@ function getLevel1Info(tilesheet) {
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
-  }, {
+  }/*, {
     isCriteriaFulfilled: word => word.length === 4,
     count: 10,
   },{
@@ -17,7 +17,11 @@ function getLevel1Info(tilesheet) {
   }, {
     isCriteriaFulfilled: word => word.length === 8,
     count: 1,
-  }];
+  }*/];
+  const background = createSprite({
+    ...rectBase,
+    color: Colors.LEMON,
+  });
   const fluffy = createSprite({
     type: Types.IMAGE,
     img: tilesheet,
@@ -53,7 +57,38 @@ function getLevel1Info(tilesheet) {
         sourceHeight: 45,
         sourceY: 602,
       },
+      CENTER_PRESSED: {
+        sourceWidth: 162,
+        sourceHeight: 45,
+        sourceX: 162,
+        sourceY: 602,
+      }
     },
+  });
+  const paper = createSprite({
+    type: Types.IMAGE,
+    img: tilesheet,
+    //visible: false,
+    states: {
+      INITIAL: {
+        sourceWidth: 137,
+        sourceHeight: 12,
+        sourceX: 810,
+        sourceY: 602,
+      },
+      PARTIAL: {
+        sourceWidth: 137,
+        sourceHeight: 15,
+        sourceX: 810,
+        sourceY: 614,
+      },
+      FINAL: {
+        sourceWidth: 137,
+        sourceHeight: 21,
+        sourceX: 810,
+        sourceY: 629,
+      }
+    }
   });
   const inputStart = createSprite({
     type: Types.IMAGE,
@@ -61,15 +96,28 @@ function getLevel1Info(tilesheet) {
     states: {
       INITIAL: {
         sourceY: 647,
-        sourceWidth: 10,
-        sourceHeight: 51,
+        sourceWidth: 9,
+        sourceHeight: 33,
+        x: 0,
       },
     },
   });
   const inputContent = createSprite({
     type: Types.RECTANGULAR,
     color: transparentize(Colors.DARK_ORANGE, 0.7),
-    x: 10,
+    x: 9,
+  });
+  const inputEnd = createSprite({
+    type: Types.IMAGE,
+    img: tilesheet,
+    states: {
+      INITIAL: {
+        sourceX: 10,
+        sourceY: 647,
+        sourceWidth: 9,
+        sourceHeight: 33,
+      },
+    }
   });
   const underscore = createSprite({
     type: Types.TEXT,
@@ -91,7 +139,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 947,
+          sourceX: 956,
           sourceY: 602,
           sourceWidth: 24,
           sourceHeight: 60,
@@ -103,7 +151,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 971,
+          sourceX: 980,
           sourceY: 602,
           sourceWidth: 33,
           sourceHeight: 60,
@@ -115,7 +163,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1004,
+          sourceX: 1013,
           sourceY: 602,
           sourceWidth: 24,
           sourceHeight: 60,
@@ -128,7 +176,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1028,
+          sourceX: 1037,
           sourceY: 602,
           sourceWidth: 24,
           sourceHeight: 57,
@@ -140,7 +188,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1049,
+          sourceX: 1058,
           sourceY: 602,
           sourceWidth: 30,
           sourceHeight: 57,
@@ -152,7 +200,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1079,
+          sourceX: 1088,
           sourceY: 602,
           sourceWidth: 21,
           sourceHeight: 58,
@@ -165,38 +213,53 @@ function getLevel1Info(tilesheet) {
     visible: false,
     color: transparentize(Colors.LIGHT_YELLOW, 0.8),
   });
-  const endGameMessage = createSprite({
+  const gameMessage1 = createSprite({
     type: Types.TEXT,
     font: "normal bold 55px nokia",
     visible: false,
     color: Colors.DARK_BROWN,
   });
-  const endGameInstruction = createSprite({
+  const gameMessage2 = createSprite({
     type: Types.TEXT,
     font: "normal bold 30px nokia",
     visible: false,
     color: Colors.DARK_BROWN,
   });
-  let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
+  const maxMissedCount = 5;
+  let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay =true;
   return {
     ...stateBase,
     get sprites() {
       initSprites();
       return sprites;
     },
-    maxMissedCount: 5,
+    maxMissedCount: maxMissedCount,
     update: function(gameInfo) {
       const speeds = [0.3, 0.5, 1];
       const limit = [5, 10, 15];
-      sprites[0].width = gameInfo.canvas.width;
-      sprites[0].height = gameInfo.canvas.height;
-      fluffy[fluffy.state].x = centerSpriteHorizontally(gameInfo.canvas, fluffy);
-      fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy.sourceHeight * fluffy.scale;
-      inputStart[inputStart.state].y = gameInfo.canvas.height - inputStart.sourceHeight * inputStart.scale;
+      background.width = gameInfo.canvas.width;
+      background.height = gameInfo.canvas.height;
+      centerFluffy(gameInfo);
+      inputStart[inputStart.state].y = inputEnd[inputEnd.state].y = gameInfo.canvas.height - 42;
       inputContent.y = gameInfo.canvas.height - 51;
-      inputContent.width = gameInfo.canvas.width - 10 * 2;
+      inputContent.width = gameInfo.canvas.width - 9 * 2;
+      inputEnd[inputEnd.state].x = gameInfo.canvas.width - 9;
       typewriter[typewriter.state].x = centerSpriteHorizontally(gameInfo.canvas, typewriter);
       typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter.sourceHeight * typewriter.scale;
+      paper.state = paper.INITIAL;
+      if (inputText.text.length > 0) {
+        paper.visible = true;
+      } else {
+        paper.visible = false;
+      }
+      if (sprites.some(sprite => sprite.visible
+        && sprite.type === Types.WORD_SPAWN
+        && sprite.text === inputText.text)
+      ) {
+        paper.state = paper.FINAL;
+      }
+      paper[paper.state].x = centerSpriteHorizontally(gameInfo.canvas, paper);
+      paper[paper.state].y = typewriter.y + 21;
       let width = getTextWidth(gameInfo.canvas, inputText);
       if (width >= inputContent.width - 100) {
         inputText.text = inputText.text.slice(0, -1);
@@ -205,6 +268,26 @@ function getLevel1Info(tilesheet) {
       underscore.x = inputText.x + width;
       underscore.y = inputContent.y + 12;
       inputText.y = underscore.y;
+      messageBackground.visible = false;
+      gameMessage1.visible = false;
+      gameMessage2.visible = false;
+      messageBackground.width = 0.75 * gameInfo.canvas.width;
+      messageBackground.height = 0.75 * gameInfo.canvas.height;
+      messageBackground.x = centerSpriteHorizontally(gameInfo.canvas, messageBackground);
+      messageBackground.y = centerSpriteVertically(gameInfo.canvas, messageBackground);
+
+      if (showHowToPlay) {
+        messageBackground.visible = true;
+        gameMessage1.visible = true;
+        gameMessage2.visible = true;
+        gameMessage1.text = "Level 1";
+        gameMessage2.text = `Don't miss more than ${maxMissedCount-1} words. Press ENTER to continue`;
+        gameMessage1.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage1);
+        gameMessage1.y = centerSpriteVertically(gameInfo.canvas, gameMessage1);
+        gameMessage2.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage2);
+        gameMessage2.y = gameMessage1.y + 80;
+        return;
+      }
 
       if (shouldRestart) {
         const stateBeforeReset = fluffy.state;
@@ -214,20 +297,16 @@ function getLevel1Info(tilesheet) {
 
       if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
         messageBackground.visible = true;
-        endGameMessage.visible = true;
-        endGameInstruction.visible = true;
-        endGameMessage.text = fluffy.state === fluffy.SAD ? "Game Over" : "Level Cleared!";
-        endGameInstruction.text = fluffy.state === fluffy.SAD ?
+        gameMessage1.visible = true;
+        gameMessage2.visible = true;
+        gameMessage1.text = fluffy.state === fluffy.SAD ? "Game Over" : "Level Cleared!";
+        gameMessage2.text = fluffy.state === fluffy.SAD ?
           "Press ENTER to go back to main page" :
           "Press ENTER to go to the next level";
-        messageBackground.width = 0.75 * gameInfo.canvas.width;
-        messageBackground.height = 0.75 * gameInfo.canvas.height;
-        messageBackground.x = centerSpriteHorizontally(gameInfo.canvas, messageBackground);
-        messageBackground.y = centerSpriteVertically(gameInfo.canvas, messageBackground);
-        endGameMessage.x = centerSpriteHorizontally(gameInfo.canvas, endGameMessage);
-        endGameMessage.y = centerSpriteVertically(gameInfo.canvas, endGameMessage);
-        endGameInstruction.x = centerSpriteHorizontally(gameInfo.canvas, endGameInstruction);
-        endGameInstruction.y = endGameMessage.y + 80;
+        gameMessage1.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage1);
+        gameMessage1.y = centerSpriteVertically(gameInfo.canvas, gameMessage1);
+        gameMessage2.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage2);
+        gameMessage2.y = gameMessage1.y + 80;
         return;
       }
 
@@ -285,10 +364,12 @@ function getLevel1Info(tilesheet) {
       if (speedIndex < speeds.length-1 && spawnedCount >= limit[speedIndex]) {
         speedIndex++;
       }
-      if (missedCount >= this.maxMissedCount) {
+      if (missedCount >= maxMissedCount) {
         fluffy.state = fluffy.SAD;
+        centerFluffy(gameInfo);
       } else if (wordEndOfLifeCount === totalWordsToSpawn) {
         fluffy.state = fluffy.HAPPY;
+        centerFluffy(gameInfo);
       }
     },
     listeners: {
@@ -296,10 +377,16 @@ function getLevel1Info(tilesheet) {
         if ((e.key >= "a" && e.key <= "z") || e.key === " ") {
           inputText.text += e.key;
           fluffy.state = fluffy.BOW;
+          typewriter.state = typewriter.CENTER_PRESSED;
         } else if (e.key === "Backspace") {
           inputText.text = inputText.text.slice(0, -1);
           fluffy.state = fluffy.BOW;
+          typewriter.state = typewriter.CENTER_PRESSED;
         } else if (e.key === "Enter") {
+          if (showHowToPlay) {
+            showHowToPlay = false;
+            return;
+          }
           if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
             shouldRestart = true;
             return;
@@ -321,29 +408,36 @@ function getLevel1Info(tilesheet) {
         if (fluffy.state === fluffy.BOW) {
           fluffy.state = fluffy.INITIAL;
         }
+        if (typewriter.state === typewriter.CENTER_PRESSED) {
+          typewriter.state = typewriter.INITIAL;
+        }
       },
     }
   };
 
+  function centerFluffy(gameInfo) {
+    fluffy[fluffy.state].x = centerSpriteHorizontally(gameInfo.canvas, fluffy);
+    fluffy[fluffy.state].y = gameInfo.canvas.height - fluffy.sourceHeight * fluffy.scale;
+  }
+
   function initSprites() {
     fluffy.state = fluffy.INITIAL;
     messageBackground.visible = false;
-    endGameMessage.visible = false;
-    endGameInstruction.visible = false;
+    gameMessage1.visible = false;
+    gameMessage2.visible = false;
     inputText.text = '';
     sprites = [
-      {
-        ...rectBase,
-        color: Colors.LEMON,
-      },
+      background,
       fluffy,
       typewriter,
+      paper,
       inputStart,
       inputContent,
-      underscore,
+      inputEnd,
       inputText,
+      underscore,
     ];
-    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
+    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay = true;
     selectionGenerator.randomize(categories).forEach((result, i) => {
       // Alternate bread & butter background
       wordBackgrounds[i % 2].forEach(sprite => {
@@ -368,7 +462,7 @@ function getLevel1Info(tilesheet) {
       totalWordsToSpawn++;
     });
     sprites.push(messageBackground);
-    sprites.push(endGameMessage);
-    sprites.push(endGameInstruction);
+    sprites.push(gameMessage1);
+    sprites.push(gameMessage2);
   }
 }

@@ -1,6 +1,7 @@
 launch();
 
 function launch() {
+  const numOfLevels = 2;
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -15,6 +16,7 @@ function launch() {
   const assets = [
     [],
     ['./assets/nokiafc22.ttf', './assets/story1.jpg', './assets/story2.jpg'],
+    ['./assets/nokiafc22.ttf', './assets/tilesheet.png'],
     ['./assets/nokiafc22.ttf', './assets/tilesheet.png'],
     ['./assets/nokiafc22.ttf', './assets/story3.jpg', './assets/story4.jpg'],
   ];
@@ -48,7 +50,7 @@ function launch() {
   });
 
   const gameInfo = {
-    states: new Array(4).fill({}),
+    states: new Array(Object.keys(States).length + numOfLevels).fill({}),
     currentState: 0,
     previousState: -1,
     canvas: canvas,
@@ -94,7 +96,11 @@ function launch() {
           gameInfo.states[i] = getLevel1Info(assets[i][1]);
           break;
         case 3:
+          gameInfo.states[i] = getBonusLevelInfo(assets[i][1], assets[i][2]);
+          break;
+        case 4:
           gameInfo.states[i] = getGameEndInfo(assets[i][1], assets[i][2]);
+          break;
         default:
           break;
       }

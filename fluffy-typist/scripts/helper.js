@@ -15,6 +15,13 @@ getTextWidth = (canvas, sprite) => {
   return ctx.measureText(sprite.text).width;
 }
 
+getTextHeight = (canvas, sprite) => {
+  const ctx = canvas.getContext("2d");
+  ctx.font = sprite.font;
+  const metrics = ctx.measureText(sprite.text);
+  return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+}
+
 centerSpriteHorizontally = (canvas, sprite) => {
   if (sprite.type === Types.IMAGE) {
     return canvas.width/2 - sprite.sourceWidth * sprite.scale/2;
@@ -28,10 +35,7 @@ centerSpriteVertically = (canvas, sprite) => {
   if (sprite.type === Types.IMAGE) {
     return canvas.height/2 - sprite.sourceHeight * sprite.scale/2;
   } else if (sprite.type === Types.TEXT) {
-    const ctx = canvas.getContext("2d");
-    ctx.font = sprite.font;
-    const metrics = ctx.measureText(sprite.text);
-    const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    const actualHeight = getTextHeight(canvas, sprite);
     return canvas.height/2 - actualHeight/2;
   }
   return canvas.height/2 - sprite.height/2;

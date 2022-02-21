@@ -6,6 +6,12 @@ const Types = {
   WORD_SPAWN: '4',
 };
 
+const States = {
+  LOADING: 0,
+  MAIN: 1,
+  END: 2,
+}
+
 const spriteBase = {
   type: Types.IMAGE,
   visible: true,
@@ -57,7 +63,6 @@ const rectBase = {
 
 const stateBase = {
   sprites: [],
-  appendSprites: false,
   update: () => {},
   listeners: {},
 }
