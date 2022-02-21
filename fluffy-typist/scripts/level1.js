@@ -2,7 +2,7 @@ function getLevel1Info(tilesheet) {
   const categories = [{
     isCriteriaFulfilled: word => word.length === 3,
     count: 3,
-  }/*, {
+  }, {
     isCriteriaFulfilled: word => word.length === 4,
     count: 10,
   },{
@@ -17,7 +17,7 @@ function getLevel1Info(tilesheet) {
   }, {
     isCriteriaFulfilled: word => word.length === 8,
     count: 1,
-  }*/];
+  }];
   const background = createSprite({
     ...rectBase,
     color: Colors.LEMON,
@@ -68,22 +68,22 @@ function getLevel1Info(tilesheet) {
   const paper = createSprite({
     type: Types.IMAGE,
     img: tilesheet,
-    //visible: false,
+    visible: false,
     states: {
       INITIAL: {
-        sourceWidth: 137,
+        sourceWidth: 138,
         sourceHeight: 12,
         sourceX: 810,
         sourceY: 602,
       },
       PARTIAL: {
-        sourceWidth: 137,
+        sourceWidth: 138,
         sourceHeight: 15,
         sourceX: 810,
         sourceY: 614,
       },
       FINAL: {
-        sourceWidth: 137,
+        sourceWidth: 138,
         sourceHeight: 21,
         sourceX: 810,
         sourceY: 629,
@@ -225,8 +225,14 @@ function getLevel1Info(tilesheet) {
     visible: false,
     color: Colors.DARK_BROWN,
   });
+  const clock = createSprite({
+    type: Types.TEXT,
+    font: "normal bold 25px nokia",
+    visible: true,
+    color: Colors.DARK_BROWN,
+  });
   const maxMissedCount = 5;
-  let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay =true;
+  let sprites = [], timer = 0, totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay =true;
   return {
     ...stateBase,
     get sprites() {
@@ -237,6 +243,7 @@ function getLevel1Info(tilesheet) {
     update: function(gameInfo) {
       const speeds = [0.3, 0.5, 1];
       const limit = [5, 10, 15];
+      clock.text = Math.floor(timer/60);
       background.width = gameInfo.canvas.width;
       background.height = gameInfo.canvas.height;
       centerFluffy(gameInfo);
@@ -309,6 +316,7 @@ function getLevel1Info(tilesheet) {
         gameMessage2.y = gameMessage1.y + 80;
         return;
       }
+      timer++;
 
       let spawnedCount = 0;
       let missedCount = 0;
@@ -437,7 +445,7 @@ function getLevel1Info(tilesheet) {
       inputText,
       underscore,
     ];
-    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay = true;
+    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay = true, timer = 0;
     selectionGenerator.randomize(categories).forEach((result, i) => {
       // Alternate bread & butter background
       wordBackgrounds[i % 2].forEach(sprite => {
@@ -464,5 +472,6 @@ function getLevel1Info(tilesheet) {
     sprites.push(messageBackground);
     sprites.push(gameMessage1);
     sprites.push(gameMessage2);
+    sprites.push(clock);
   }
 }
