@@ -126,13 +126,16 @@ function launch() {
             break;
           case Types.IMAGE:
             ctx.globalAlpha = sprite.alpha;
-            ctx.drawImage(
-              sprite.img,
-              sprite.sourceX, sprite.sourceY,
-              sprite.sourceWidth, sprite.sourceHeight,
-              sprite.x, sprite.y,
-              sprite.sourceWidth * sprite.scale, sprite.sourceHeight * sprite.scale,
-            )
+            for (let i = 0; i < sprite.repeatX; i++) {
+              ctx.drawImage(
+                sprite.img,
+                sprite.sourceX, sprite.sourceY,
+                sprite.sourceWidth, sprite.sourceHeight,
+                sprite.x + i * sprite.sourceWidth * sprite.scale,
+                sprite.y,
+                sprite.sourceWidth * sprite.scale, sprite.sourceHeight * sprite.scale,
+              )
+            }
           case Types.RECTANGULAR:
             ctx.fillStyle = sprite.color;
             ctx.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);

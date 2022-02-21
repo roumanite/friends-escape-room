@@ -31,6 +31,8 @@ artBase[artBase.INITIAL] = {
   sourceHeight: 0,
   scale: 1,
   rotation: 0,
+  repeatX: 1,
+  repeatY: 1,
 };
 
 const textBase = {
