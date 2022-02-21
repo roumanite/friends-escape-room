@@ -38,7 +38,7 @@ artBase[artBase.INITIAL] = {
 const textBase = {
   ...spriteBase,
   type: Types.TEXT,
-  font: '',
+  font: 'normal bold 25px nokia',
   baseline: 'top',
   shadowColor: 'black',
   shadowBlur: 0,

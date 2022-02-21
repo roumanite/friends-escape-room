@@ -75,13 +75,13 @@ function getLevel1Info(tilesheet) {
     type: Types.TEXT,
     text: '_',
     font: 'normal bold 30px nokia',
-    color: Colors.BLACK,
+    color: Colors.DARK_BROWN,
   });
   const inputText = createSprite({
     type: Types.TEXT,
     text: '',
     font: 'normal bold 30px nokia',
-    color: Colors.BLACK,
+    color: Colors.DARK_BROWN,
     x: 27,
   });
   const wordBackgrounds = [
@@ -130,7 +130,7 @@ function getLevel1Info(tilesheet) {
         INITIAL: {
           sourceX: 1028,
           sourceY: 602,
-          sourceWidth: 12,
+          sourceWidth: 24,
           sourceHeight: 57,
         },
       },
@@ -140,7 +140,7 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1031,
+          sourceX: 1049,
           sourceY: 602,
           sourceWidth: 30,
           sourceHeight: 57,
@@ -152,14 +152,31 @@ function getLevel1Info(tilesheet) {
       visible: false,
       states: {
         INITIAL: {
-          sourceX: 1052,
+          sourceX: 1079,
           sourceY: 602,
-          sourceWidth: 12,
-          sourceHeight: 57,
+          sourceWidth: 21,
+          sourceHeight: 58,
         },
       },
     }],
   ];
+  const messageBackground = createSprite({
+    type: Types.RECTANGULAR,
+    visible: false,
+    color: transparentize(Colors.LIGHT_YELLOW, 0.8),
+  });
+  const endGameMessage = createSprite({
+    type: Types.TEXT,
+    font: "normal bold 55px nokia",
+    visible: false,
+    color: Colors.DARK_BROWN,
+  });
+  const endGameInstruction = createSprite({
+    type: Types.TEXT,
+    font: "normal bold 30px nokia",
+    visible: false,
+    color: Colors.DARK_BROWN,
+  });
   let sprites = [], totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
   return {
     ...stateBase,
@@ -169,7 +186,7 @@ function getLevel1Info(tilesheet) {
     },
     maxMissedCount: 5,
     update: function(gameInfo) {
-      const speeds = [0.3, 0.5, 0.7];
+      const speeds = [0.3, 0.5, 1];
       const limit = [5, 10, 15];
       sprites[0].width = gameInfo.canvas.width;
       sprites[0].height = gameInfo.canvas.height;
@@ -180,17 +197,6 @@ function getLevel1Info(tilesheet) {
       inputContent.width = gameInfo.canvas.width - 10 * 2;
       typewriter[typewriter.state].x = centerSpriteHorizontally(gameInfo.canvas, typewriter);
       typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter.sourceHeight * typewriter.scale;
-      
-      if (shouldRestart) {
-        const stateBeforeReset = fluffy.state;
-        gameInfo.switchState(stateBeforeReset === fluffy.SAD ? 1 : 3);
-        return;
-      }
-
-      if (fluffy.state === fluffy.SAD) {
-        return;
-      }
-
       let width = getTextWidth(gameInfo.canvas, inputText);
       if (width >= inputContent.width - 100) {
         inputText.text = inputText.text.slice(0, -1);
@@ -199,6 +205,32 @@ function getLevel1Info(tilesheet) {
       underscore.x = inputText.x + width;
       underscore.y = inputContent.y + 12;
       inputText.y = underscore.y;
+
+      if (shouldRestart) {
+        const stateBeforeReset = fluffy.state;
+        gameInfo.switchState(stateBeforeReset === fluffy.SAD ? 1 : 3);
+        return;
+      }
+
+      if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
+        messageBackground.visible = true;
+        endGameMessage.visible = true;
+        endGameInstruction.visible = true;
+        endGameMessage.text = fluffy.state === fluffy.SAD ? "Game Over" : "Level Cleared!";
+        endGameInstruction.text = fluffy.state === fluffy.SAD ?
+          "Press ENTER to go back to main page" :
+          "Press ENTER to go to the next level";
+        messageBackground.width = 0.75 * gameInfo.canvas.width;
+        messageBackground.height = 0.75 * gameInfo.canvas.height;
+        messageBackground.x = centerSpriteHorizontally(gameInfo.canvas, messageBackground);
+        messageBackground.y = centerSpriteVertically(gameInfo.canvas, messageBackground);
+        endGameMessage.x = centerSpriteHorizontally(gameInfo.canvas, endGameMessage);
+        endGameMessage.y = centerSpriteVertically(gameInfo.canvas, endGameMessage);
+        endGameInstruction.x = centerSpriteHorizontally(gameInfo.canvas, endGameInstruction);
+        endGameInstruction.y = endGameMessage.y + 80;
+        return;
+      }
+
       let spawnedCount = 0;
       let missedCount = 0;
       let wordEndOfLifeCount = 0;
@@ -237,6 +269,9 @@ function getLevel1Info(tilesheet) {
         if (sprite.type === Types.WORD_SPAWN) {
           if (core.y > gameInfo.canvas.height) {
             sprite.visible = false;
+            [3, 2, 1].forEach(idx => {
+              sprites[i-idx].visible = false;
+            });
             missedCount++;
           }
           if (core.timer === undefined) {
@@ -254,7 +289,6 @@ function getLevel1Info(tilesheet) {
         fluffy.state = fluffy.SAD;
       } else if (wordEndOfLifeCount === totalWordsToSpawn) {
         fluffy.state = fluffy.HAPPY;
-        shouldRestart = true;
       }
     },
     listeners: {
@@ -266,15 +300,19 @@ function getLevel1Info(tilesheet) {
           inputText.text = inputText.text.slice(0, -1);
           fluffy.state = fluffy.BOW;
         } else if (e.key === "Enter") {
-          if (fluffy.state === fluffy.SAD) {
+          if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
             shouldRestart = true;
             return;
           }
-          sprites.forEach(sprite => {
-            if (sprite.type === Types.WORD_SPAWN && sprite.text === inputText.text) {
+          sprites.forEach((sprite, i) => {
+            if (sprite.visible
+              && sprite.type === Types.WORD_SPAWN
+              && sprite.text === inputText.text) {
               inputText.text = '';
               sprite.visible = false;
-              sprite.timer = undefined;
+              [3, 2, 1].forEach(idx => {
+                sprites[i-idx].visible = false;
+              });
             }
           });
         }
@@ -289,17 +327,28 @@ function getLevel1Info(tilesheet) {
 
   function initSprites() {
     fluffy.state = fluffy.INITIAL;
+    messageBackground.visible = false;
+    endGameMessage.visible = false;
+    endGameInstruction.visible = false;
     inputText.text = '';
-    sprites = [{
-      ...rectBase,
-      color: Colors.LEMON,
-    }, fluffy, typewriter, inputStart, inputContent, underscore, inputText];
+    sprites = [
+      {
+        ...rectBase,
+        color: Colors.LEMON,
+      },
+      fluffy,
+      typewriter,
+      inputStart,
+      inputContent,
+      underscore,
+      inputText,
+    ];
     totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false;
     selectionGenerator.randomize(categories).forEach((result, i) => {
       // Alternate bread & butter background
       wordBackgrounds[i % 2].forEach(sprite => {
         const bg = createSprite(sprite);
-        bg[bg.state].y = i - bg.sourceHeight * bg.scale/3;
+        bg[bg.state].y = i - 60 - bg.sourceHeight * bg.scale/3;
         bg[bg.state].timer = i * 60;
         bg[bg.state].vy = 0;
         sprites.push(bg);
@@ -308,15 +357,18 @@ function getLevel1Info(tilesheet) {
         ...textBase,
         type: Types.WORD_SPAWN,
         x: 0,
-        y: i,
+        y: i - 60,
         vy: 0,
         text: result.word,
         font: 'normal bold 30px nokia',
-        color: Colors.DARK_YELLOW,
+        color: Colors.DARK_BROWN,
         visible: false,
         timer: i * 60,
       });
       totalWordsToSpawn++;
     });
+    sprites.push(messageBackground);
+    sprites.push(endGameMessage);
+    sprites.push(endGameInstruction);
   }
 }

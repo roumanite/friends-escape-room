@@ -16,23 +16,25 @@ getTextWidth = (canvas, sprite) => {
 }
 
 centerSpriteHorizontally = (canvas, sprite) => {
-  return canvas.width/2 - sprite.sourceWidth * sprite.scale/2;
+  if (sprite.type === Types.IMAGE) {
+    return canvas.width/2 - sprite.sourceWidth * sprite.scale/2;
+  } else if (sprite.type === Types.TEXT) {
+    return canvas.width/2 - getTextWidth(canvas, sprite)/2;
+  }
+  return canvas.width/2 - sprite.width/2;
 }
 
 centerSpriteVertically = (canvas, sprite) => {
-  return canvas.height/2 - sprite.sourceHeight * sprite.scale/2;
-}
-
-centerTextHorizontally = (canvas, sprite) => {
-  return canvas.width/2 - getTextWidth(canvas, sprite)/2;
-}
-
-centerTextVertically = (canvas, sprite) => {
-  const ctx = canvas.getContext("2d");
-  ctx.font = sprite.font;
-  const metrics = ctx.measureText(sprite.text);
-  const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-  return canvas.height/2 - actualHeight/2;
+  if (sprite.type === Types.IMAGE) {
+    return canvas.height/2 - sprite.sourceHeight * sprite.scale/2;
+  } else if (sprite.type === Types.TEXT) {
+    const ctx = canvas.getContext("2d");
+    ctx.font = sprite.font;
+    const metrics = ctx.measureText(sprite.text);
+    const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    return canvas.height/2 - actualHeight/2;
+  }
+  return canvas.height/2 - sprite.height/2;
 }
 
 createSprite = (props) => {
