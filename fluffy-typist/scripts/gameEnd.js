@@ -2,7 +2,7 @@ function getGameEndInfo(ts1, ts2) {
   const messageBackground = createSprite({
     type: Types.RECTANGULAR,
     visible: true,
-    color: transparentize(Colors.DARK_ORANGE, 0.8),
+    color: transparentize(Colors.DARK_ORANGE, 0.5),
   });
   const gameEndMsg = createSprite({
     type: Types.TEXT,
