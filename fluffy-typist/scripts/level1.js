@@ -232,7 +232,7 @@ function getLevel1Info(tilesheet) {
     color: Colors.DARK_BROWN,
   });
   const maxMissedCount = 5;
-  let sprites = [], timer = 0, totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay =true;
+  let sprites = [], timer = 0, totalWordsToSpawn = 0, speedIndex = 0, shouldSwitchState = false, showHowToPlay =true;
   return {
     ...stateBase,
     get sprites() {
@@ -243,45 +243,17 @@ function getLevel1Info(tilesheet) {
     update: function(gameInfo) {
       const speeds = [0.3, 0.5, 1];
       const limit = [5, 10, 15];
+      messageBackground.visible = gameMessage1.visible = gameMessage2.visible = false;
       clock.text = Math.floor(timer/60);
-      background.width = gameInfo.canvas.width;
-      background.height = gameInfo.canvas.height;
-      centerFluffy(gameInfo);
-      inputStart[inputStart.state].y = inputEnd[inputEnd.state].y = gameInfo.canvas.height - 42;
-      inputContent.y = gameInfo.canvas.height - 51;
-      inputContent.width = gameInfo.canvas.width - 9 * 2;
-      inputEnd[inputEnd.state].x = gameInfo.canvas.width - 9;
-      typewriter[typewriter.state].x = centerSpriteHorizontally(gameInfo.canvas, typewriter);
-      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter.sourceHeight * typewriter.scale;
+
       paper.state = paper.INITIAL;
-      if (inputText.text.length > 0) {
-        paper.visible = true;
-      } else {
-        paper.visible = false;
-      }
+      paper.visible = inputText.text.length > 0;
       if (sprites.some(sprite => sprite.visible
         && sprite.type === Types.WORD_SPAWN
         && sprite.text === inputText.text)
       ) {
         paper.state = paper.FINAL;
       }
-      paper[paper.state].x = centerSpriteHorizontally(gameInfo.canvas, paper);
-      paper[paper.state].y = typewriter.y + 21;
-      let width = getTextWidth(gameInfo.canvas, inputText);
-      if (width >= inputContent.width - 100) {
-        inputText.text = inputText.text.slice(0, -1);
-        width = getTextWidth(gameInfo.canvas, inputText);
-      }
-      underscore.x = inputText.x + width;
-      underscore.y = inputContent.y + 12;
-      inputText.y = underscore.y;
-      messageBackground.visible = false;
-      gameMessage1.visible = false;
-      gameMessage2.visible = false;
-      messageBackground.width = 0.75 * gameInfo.canvas.width;
-      messageBackground.height = 0.75 * gameInfo.canvas.height;
-      messageBackground.x = centerSpriteHorizontally(gameInfo.canvas, messageBackground);
-      messageBackground.y = centerSpriteVertically(gameInfo.canvas, messageBackground);
 
       if (showHowToPlay) {
         messageBackground.visible = true;
@@ -293,16 +265,10 @@ function getLevel1Info(tilesheet) {
         gameMessage1.y = centerSpriteVertically(gameInfo.canvas, gameMessage1);
         gameMessage2.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage2);
         gameMessage2.y = gameMessage1.y + 80;
-        return;
-      }
-
-      if (shouldRestart) {
+      } else if (shouldSwitchState) {
         const stateBeforeReset = fluffy.state;
         gameInfo.switchState(stateBeforeReset === fluffy.SAD ? 1 : 3);
-        return;
-      }
-
-      if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
+      } else if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
         messageBackground.visible = true;
         gameMessage1.visible = true;
         gameMessage2.visible = true;
@@ -314,71 +280,92 @@ function getLevel1Info(tilesheet) {
         gameMessage1.y = centerSpriteVertically(gameInfo.canvas, gameMessage1);
         gameMessage2.x = centerSpriteHorizontally(gameInfo.canvas, gameMessage2);
         gameMessage2.y = gameMessage1.y + 80;
-        return;
-      }
-      timer++;
+      } else {
+        timer++;
 
-      let spawnedCount = 0;
-      let missedCount = 0;
-      let wordEndOfLifeCount = 0;
-      sprites.forEach((sprite, i) => {
-        const core = sprite.state === undefined ? sprite : sprite[sprite.state];
-        // Update y
-        if (sprite.visible && core.vy !== undefined) {
-          core.vy = speeds[speedIndex];
-          core.y += core.vy;
-        }
-        if (core.timer !== undefined) {
-          if (core.timer <= 0) {
-            sprite.visible = true;
-            core.timer = undefined;
-            if (sprite.type === Types.WORD_SPAWN) {
-              const textWidth = getTextWidth(gameInfo.canvas, sprite)
-              sprites[i-2][sprites[i-2].state].repeatX = Math.ceil(textWidth/sprites[i-2].sourceWidth * sprites[i-2].scale);
-              const totalWidth = sprites[i-3].sourceWidth * sprites[i-3].scale +
-                sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX +
-                sprites[i-1].sourceWidth * sprites[i-1].scale;
-              const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/totalWidth));
-              const x = randomNum * Math.ceil(totalWidth);
-              sprites[i-3][sprites[i-3].state].x = x;
-              sprite.x =
-                sprites[i-3].x + sprites[i-3].sourceWidth * sprites[i-3].scale +
-                sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX / 2 -
-                textWidth / 2;
-              sprites[i-2][sprites[i-2].state].x = sprites[i-3].x + sprites[i-3].sourceWidth * sprites[i-3].scale;
-              sprites[i-1][sprites[i-1].state].x = sprites[i-2].x + sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX;
-            }
-          } else {
-            core.timer -= speeds[speedIndex] * 1;
+        let spawnedCount = 0;
+        let missedCount = 0;
+        let wordEndOfLifeCount = 0;
+        sprites.forEach((sprite, i) => {
+          const core = sprite.state === undefined ? sprite : sprite[sprite.state];
+          // Update y
+          if (sprite.visible && core.vy !== undefined) {
+            core.vy = speeds[speedIndex];
+            core.y += core.vy;
           }
-        }
-
-        if (sprite.type === Types.WORD_SPAWN) {
-          if (core.y > gameInfo.canvas.height) {
-            sprite.visible = false;
-            [3, 2, 1].forEach(idx => {
-              sprites[i-idx].visible = false;
-            });
-            missedCount++;
-          }
-          if (core.timer === undefined) {
-            spawnedCount++;
-            if (!sprite.visible) {
-              wordEndOfLifeCount++;
+          if (core.timer !== undefined) {
+            if (core.timer <= 0) {
+              sprite.visible = true;
+              core.timer = undefined;
+              if (sprite.type === Types.WORD_SPAWN) {
+                const textWidth = getTextWidth(gameInfo.canvas, sprite)
+                sprites[i-2][sprites[i-2].state].repeatX = Math.ceil(textWidth/sprites[i-2].sourceWidth * sprites[i-2].scale);
+                const totalWidth = sprites[i-3].sourceWidth * sprites[i-3].scale +
+                  sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX +
+                  sprites[i-1].sourceWidth * sprites[i-1].scale;
+                const randomNum = Math.floor(Math.random() * Math.floor(gameInfo.canvas.width/totalWidth));
+                const x = randomNum * Math.ceil(totalWidth);
+                sprites[i-3][sprites[i-3].state].x = x;
+                sprite.x =
+                  sprites[i-3].x + sprites[i-3].sourceWidth * sprites[i-3].scale +
+                  sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX / 2 -
+                  textWidth / 2;
+                sprites[i-2][sprites[i-2].state].x = sprites[i-3].x + sprites[i-3].sourceWidth * sprites[i-3].scale;
+                sprites[i-1][sprites[i-1].state].x = sprites[i-2].x + sprites[i-2].sourceWidth * sprites[i-2].scale * sprites[i-2].repeatX;
+              }
+            } else {
+              core.timer -= speeds[speedIndex] * 1;
             }
           }
+  
+          if (sprite.type === Types.WORD_SPAWN) {
+            if (core.y > gameInfo.canvas.height) {
+              sprite.visible = false;
+              [3, 2, 1].forEach(idx => {
+                sprites[i-idx].visible = false;
+              });
+              missedCount++;
+            }
+            if (core.timer === undefined) {
+              spawnedCount++;
+              if (!sprite.visible) {
+                wordEndOfLifeCount++;
+              }
+            }
+          }
+        });
+        if (speedIndex < speeds.length-1 && spawnedCount >= limit[speedIndex]) {
+          speedIndex++;
         }
-      });
-      if (speedIndex < speeds.length-1 && spawnedCount >= limit[speedIndex]) {
-        speedIndex++;
+        if (missedCount >= maxMissedCount) {
+          fluffy.state = fluffy.SAD;
+        } else if (wordEndOfLifeCount === totalWordsToSpawn) {
+          fluffy.state = fluffy.HAPPY;
+        }
       }
-      if (missedCount >= maxMissedCount) {
-        fluffy.state = fluffy.SAD;
-        centerFluffy(gameInfo);
-      } else if (wordEndOfLifeCount === totalWordsToSpawn) {
-        fluffy.state = fluffy.HAPPY;
-        centerFluffy(gameInfo);
+      background.width = gameInfo.canvas.width;
+      background.height = gameInfo.canvas.height;
+      centerFluffy(gameInfo);
+      inputStart[inputStart.state].y = inputEnd[inputEnd.state].y = gameInfo.canvas.height - 42;
+      inputContent.y = gameInfo.canvas.height - 51;
+      inputContent.width = gameInfo.canvas.width - 9 * 2;
+      inputEnd[inputEnd.state].x = gameInfo.canvas.width - 9;
+      typewriter[typewriter.state].x = centerSpriteHorizontally(gameInfo.canvas, typewriter);
+      typewriter[typewriter.state].y = gameInfo.canvas.height - typewriter.sourceHeight * typewriter.scale;
+      paper[paper.state].x = centerSpriteHorizontally(gameInfo.canvas, paper);
+      paper[paper.state].y = typewriter.y + 21;
+      let width = getTextWidth(gameInfo.canvas, inputText);
+      if (width >= inputContent.width - 100) {
+        inputText.text = inputText.text.slice(0, -1);
+        width = getTextWidth(gameInfo.canvas, inputText);
       }
+      underscore.x = inputText.x + width;
+      underscore.y = inputContent.y + 12;
+      inputText.y = underscore.y;
+      messageBackground.width = 0.75 * gameInfo.canvas.width;
+      messageBackground.height = 0.75 * gameInfo.canvas.height;
+      messageBackground.x = centerSpriteHorizontally(gameInfo.canvas, messageBackground);
+      messageBackground.y = centerSpriteVertically(gameInfo.canvas, messageBackground);
     },
     listeners: {
       'keydown': e => {
@@ -396,7 +383,7 @@ function getLevel1Info(tilesheet) {
             return;
           }
           if (fluffy.state === fluffy.SAD || fluffy.state === fluffy.HAPPY) {
-            shouldRestart = true;
+            shouldSwitchState = true;
             return;
           }
           sprites.forEach((sprite, i) => {
@@ -445,7 +432,7 @@ function getLevel1Info(tilesheet) {
       inputText,
       underscore,
     ];
-    totalWordsToSpawn = 0, speedIndex = 0, shouldRestart = false, showHowToPlay = true, timer = 0;
+    totalWordsToSpawn = 0, speedIndex = 0, shouldSwitchState = false, showHowToPlay = true, timer = 0;
     selectionGenerator.randomize(categories).forEach((result, i) => {
       // Alternate bread & butter background
       wordBackgrounds[i % 2].forEach(sprite => {

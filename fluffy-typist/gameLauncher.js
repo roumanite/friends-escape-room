@@ -8,6 +8,12 @@ function launch() {
   canvas.height = window.innerHeight;
   selectionGenerator.words = words;
 
+  // Game states related
+  const states = new Array(Object.keys(States).length + numOfLevels).fill({});
+  let currentState = 0;
+  let previousState = -1;
+  let sprites = [];
+
   window.onresize = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -50,25 +56,21 @@ function launch() {
   });
 
   const gameInfo = {
-    states: new Array(Object.keys(States).length + numOfLevels).fill({}),
-    currentState: 0,
-    previousState: -1,
     canvas: canvas,
-    sprites: [],
-    switchState: function(level = this.currentState + 1) {
+    switchState: function(level = currentState + 1) {
       cleanUpLevel();
-      this.currentState = level;
-      this.sprites = gameInfo.states[this.currentState].sprites;
-      Object.entries(gameInfo.states[this.currentState].listeners || {}).forEach(([e, callback]) => {
+      currentState = level;
+      sprites = states[currentState].sprites;
+      Object.entries(states[currentState].listeners || {}).forEach(([e, callback]) => {
         window.addEventListener(e, callback);
       });
     },
   }
-  gameInfo.states[0] = {
+  states[0] = {
     ...stateBase,
     update: () => {
-      if (Object.keys(gameInfo.states[1]).length > 0) {
-        gameInfo.switchState(gameInfo.previousState === -1 ? gameInfo.currentState + 1 : gameInfo.previousState);
+      if (Object.keys(states[1]).length > 0) {
+        gameInfo.switchState(previousState === -1 ? currentState + 1 : previousState);
       }
     }
   };
@@ -76,30 +78,30 @@ function launch() {
   update();
   function update() {
     requestAnimationFrame(update);
-    gameInfo.states[gameInfo.currentState].update(gameInfo);
+    states[currentState].update(gameInfo);
     render();
   }
 
   function cleanUpLevel() {
-    Object.entries(gameInfo.states[gameInfo.currentState].listeners || {}).forEach(([e, callback]) => {
+    Object.entries(states[currentState].listeners || {}).forEach(([e, callback]) => {
       window.removeEventListener(e, callback);
     });
   }
 
   function initGameState(i) {
-    if (Object.keys(gameInfo.states[i]).length === 0 && assets[i].every(asset => typeof(asset) !== 'string')) {
+    if (Object.keys(states[i]).length === 0 && assets[i].every(asset => typeof(asset) !== 'string')) {
       switch(i) {
         case 1:
-          gameInfo.states[i] = getIntroInfo(assets[i][1], assets[i][2]);
+          states[i] = getIntroInfo(assets[i][1], assets[i][2]);
           break;
         case 2:
-          gameInfo.states[i] = getLevel1Info(assets[i][1]);
+          states[i] = getLevel1Info(assets[i][1]);
           break;
         case 3:
-          gameInfo.states[i] = getBonusLevelInfo(assets[i][1], assets[i][2]);
+          states[i] = getBonusLevelInfo(assets[i][1], assets[i][2]);
           break;
         case 4:
-          gameInfo.states[i] = getGameEndInfo(assets[i][1], assets[i][2]);
+          states[i] = getGameEndInfo(assets[i][1], assets[i][2]);
           break;
         default:
           break;
@@ -109,7 +111,7 @@ function launch() {
 
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    gameInfo.sprites.forEach(sprite => {
+    sprites.forEach(sprite => {
       if (sprite.visible) {
         ctx.globalAlpha = sprite.alpha;
         switch(sprite.type) {

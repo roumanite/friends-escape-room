@@ -11,3 +11,4 @@ Collection of JavaScript games
     * Manage various game states and levels
     * Prevent textures bleeding in Canvas
     * Create fade in & fade out effect in Canvas
+    * Handle responsiveness in Canvas
