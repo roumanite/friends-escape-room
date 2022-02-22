@@ -55,7 +55,7 @@ function getGameEndInfo(ts1, ts2) {
       },
     }
   });
-  let shouldSwitch = false;
+  let shouldSwitchState = false;
   return {
     ...stateBase,
     sprites: [
@@ -67,9 +67,9 @@ function getGameEndInfo(ts1, ts2) {
       gameEndDesc2,
     ],
     update: (gameInfo) => {
-      if (shouldSwitch) {
+      if (shouldSwitchState) {
         gameInfo.switchState(1);
-        shouldSwitch = false;
+        shouldSwitchState = false;
       } else {
         messageBackground.width = 0.75 * gameInfo.canvas.width;
         messageBackground.height = 0.75 * gameInfo.canvas.height;
@@ -96,7 +96,7 @@ function getGameEndInfo(ts1, ts2) {
     listeners: {
       'keydown': e => {
         if (e.key === "Enter") {
-          shouldSwitch = true;
+          shouldSwitchState = true;
         }
       },
     },
